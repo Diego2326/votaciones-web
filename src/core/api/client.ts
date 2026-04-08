@@ -15,7 +15,7 @@ declare module 'axios' {
   }
 }
 
-const unauthenticatedClient = axios.create({
+export const unauthenticatedClient = axios.create({
   baseURL: env.apiUrl,
 })
 

@@ -15,6 +15,22 @@ import {
   type LoginSchema,
 } from '@/features/auth/schemas/auth.schema'
 
+function getLoginErrorMessage(error: unknown) {
+  const appError = toAppError(error)
+  const normalizedMessage = appError.message.toLowerCase()
+
+  if (
+    appError.status === 401 ||
+    normalizedMessage.includes('bad credentials') ||
+    normalizedMessage.includes('invalid credentials') ||
+    normalizedMessage.includes('credenciales invalidas')
+  ) {
+    return 'Usuario y/o contrasena incorrecta.'
+  }
+
+  return appError.message
+}
+
 export function LoginPage() {
   const loginMutation = useLogin()
   const {
@@ -24,7 +40,7 @@ export function LoginPage() {
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
+      usernameOrEmail: '',
       password: '',
     },
   })
@@ -38,15 +54,18 @@ export function LoginPage() {
           <p>Ingresa al panel para controlar torneos, brackets y votos en vivo.</p>
         </div>
         {loginMutation.isError ? (
-          <PageError message={toAppError(loginMutation.error).message} />
+          <PageError
+            title="No se pudo iniciar sesion"
+            message={getLoginErrorMessage(loginMutation.error)}
+          />
         ) : null}
         <form className="form-grid" onSubmit={handleSubmit((values) => loginMutation.mutate(values))}>
           <Input
-            id="email"
-            type="email"
-            label="Correo"
-            error={errors.email?.message}
-            {...register('email')}
+            id="usernameOrEmail"
+            type="text"
+            label="Usuario o correo"
+            error={errors.usernameOrEmail?.message}
+            {...register('usernameOrEmail')}
           />
           <Input
             id="password"

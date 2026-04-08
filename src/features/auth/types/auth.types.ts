@@ -1,7 +1,7 @@
 import type { AuthResponse } from '@/core/types/domain'
 
 export interface LoginInput {
-  email: string
+  usernameOrEmail: string
   password: string
 }
 

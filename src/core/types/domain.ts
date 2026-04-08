@@ -13,11 +13,18 @@ export interface User {
 export interface AuthTokens {
   accessToken: string
   refreshToken: string
+  tokenType?: string
+  expiresIn?: number
 }
 
 export interface AuthResponse {
   accessToken: string
   refreshToken: string
+  user?: User
+}
+
+export interface AuthApiResponse {
+  tokens: AuthTokens
   user: User
 }
 

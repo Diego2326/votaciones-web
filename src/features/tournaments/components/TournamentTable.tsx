@@ -14,14 +14,21 @@ import type { Tournament } from '@/core/types/domain'
 
 export function TournamentTable({
   tournaments,
+  emptyMessage,
 }: {
   tournaments: Tournament[]
+  emptyMessage?: string
 }) {
+  if (tournaments.length === 0) {
+    return <p>{emptyMessage ?? 'No hay torneos para mostrar.'}</p>
+  }
+
   return (
     <Table>
       <TableHead>
         <TableRow>
           <TableCell header>Nombre</TableCell>
+          <TableCell header>Descripcion</TableCell>
           <TableCell header>Estado</TableCell>
           <TableCell header>Publicado</TableCell>
           <TableCell header>Acciones</TableCell>
@@ -31,8 +38,19 @@ export function TournamentTable({
         {tournaments.map((tournament) => (
           <TableRow key={tournament.id}>
             <TableCell>{tournament.name}</TableCell>
+            <TableCell>{tournament.description ?? 'Sin descripcion'}</TableCell>
             <TableCell>
-              <Badge tone={tournament.active ? 'success' : 'neutral'}>
+              <Badge
+                tone={
+                  tournament.active
+                    ? 'success'
+                    : tournament.status === 'CLOSED'
+                      ? 'danger'
+                      : tournament.published
+                        ? 'warning'
+                        : 'neutral'
+                }
+              >
                 {tournament.status}
               </Badge>
             </TableCell>

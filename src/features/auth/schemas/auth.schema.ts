@@ -1,7 +1,10 @@
 import { z } from 'zod'
 
 export const loginSchema = z.object({
-  email: z.email('Ingresa un correo valido'),
+  usernameOrEmail: z
+    .string()
+    .trim()
+    .min(1, 'Ingresa tu usuario o correo'),
   password: z.string().min(6, 'La contrasena debe tener al menos 6 caracteres'),
 })
 

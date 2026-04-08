@@ -9,6 +9,9 @@ import { ORGANIZER_ROLES, ADMIN_ROLES } from '@/core/constants/roles'
 import { ROUTES } from '@/core/constants/routes'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { DashboardPage } from '@/pages/dashboard/DashboardPage'
+import { TournamentListPage } from '@/features/tournaments/pages/TournamentListPage'
+import { TournamentCreatePage } from '@/features/tournaments/pages/TournamentCreatePage'
 
 export function AppRouter() {
   const router = createBrowserRouter([
@@ -80,24 +83,15 @@ export function AppRouter() {
               children: [
                 {
                   path: ROUTES.dashboard,
-                  lazy: async () => ({
-                    Component: (await import('@/pages/dashboard/DashboardPage'))
-                      .DashboardPage,
-                  }),
+                  element: <DashboardPage />,
                 },
                 {
                   path: ROUTES.tournaments,
-                  lazy: async () => ({
-                    Component: (await import('@/features/tournaments/pages/TournamentListPage'))
-                      .TournamentListPage,
-                  }),
+                  element: <TournamentListPage />,
                 },
                 {
                   path: ROUTES.tournamentsNew,
-                  lazy: async () => ({
-                    Component: (await import('@/features/tournaments/pages/TournamentCreatePage'))
-                      .TournamentCreatePage,
-                  }),
+                  element: <TournamentCreatePage />,
                 },
                 {
                   path: ROUTES.tournamentDetail,
