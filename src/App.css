@@ -1,0 +1,173 @@
+.app-shell {
+  min-height: 100vh;
+  padding: 48px 24px 72px;
+  background:
+    radial-gradient(circle at top left, rgba(211, 84, 0, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(0, 109, 119, 0.14), transparent 26%),
+    linear-gradient(180deg, #f8f4ec 0%, #f4efe5 100%);
+  color: #1f2933;
+}
+
+.hero-panel,
+.reference-panel,
+.content-grid {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 24px;
+}
+
+.hero-copy,
+.hero-card,
+.panel,
+.reference-copy {
+  border: 1px solid rgba(31, 41, 51, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 252, 247, 0.86);
+  box-shadow: 0 18px 60px rgba(81, 64, 42, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.hero-copy {
+  padding: 40px;
+}
+
+.hero-card,
+.panel,
+.reference-copy {
+  padding: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #9a3412;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.lead {
+  max-width: 62ch;
+  color: #52606d;
+  font-size: 1.05rem;
+}
+
+.meta-grid {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0 0;
+}
+
+.meta-grid div {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #fff7ed;
+}
+
+.meta-grid dt {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c2410c;
+}
+
+.meta-grid dd {
+  margin: 0;
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.95rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.panel h2,
+.reference-copy h2,
+.hero-card h2 {
+  margin-top: 0;
+}
+
+.panel ol,
+.panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #52606d;
+}
+
+.panel li + li {
+  margin-top: 10px;
+}
+
+.code-card {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #14323f;
+}
+
+.code-title {
+  margin: 0;
+  color: #98c1d9;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.code-card code,
+.panel code,
+.reference-copy pre {
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+}
+
+.code-card code {
+  color: #f7fbff;
+}
+
+.reference-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.reference-copy pre {
+  margin: 0;
+  overflow: auto;
+  border-radius: 18px;
+  padding: 16px;
+  background: #1f2933;
+  color: #f8fafc;
+}
+
+@media (max-width: 900px) {
+  .hero-panel,
+  .content-grid,
+  .reference-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell {
+    padding: 24px 16px 48px;
+  }
+
+  .hero-copy,
+  .hero-card,
+  .panel,
+  .reference-copy {
+    padding: 22px;
+    border-radius: 22px;
+  }
+}
