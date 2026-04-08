@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { useAuthStore } from '@/app/store/auth.store'
@@ -11,7 +12,7 @@ const links = [
   { to: ROUTES.audit, label: 'Auditoria' },
 ]
 
-export function AppLayout() {
+export function AppLayout({ children }: PropsWithChildren) {
   const user = useAuthStore((state) => state.user)
   const clearSession = useAuthStore((state) => state.clearSession)
 
@@ -45,7 +46,7 @@ export function AppLayout() {
           </Button>
         </header>
         <main className="page-content">
-          <Outlet />
+          {children ?? <Outlet />}
         </main>
       </div>
     </div>
