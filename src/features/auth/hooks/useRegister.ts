@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuthStore } from '@/app/store/auth.store'
-import { ROUTES } from '@/core/constants/routes'
+import { getDefaultRouteForUser } from '@/core/utils/authRoutes'
 import { authApi } from '@/features/auth/api/authApi'
 
 export function useRegister() {
@@ -13,7 +13,7 @@ export function useRegister() {
     mutationFn: authApi.register,
     onSuccess: (response) => {
       setSession(response)
-      navigate(ROUTES.dashboard, { replace: true })
+      navigate(getDefaultRouteForUser(response.user), { replace: true })
     },
   })
 }

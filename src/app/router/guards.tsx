@@ -2,8 +2,9 @@ import type { PropsWithChildren } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
 import { Loader } from '@/components/ui/Loader'
-import { useAuth } from '@/core/hooks/useAuth'
 import { ROUTES } from '@/core/constants/routes'
+import { useAuth } from '@/core/hooks/useAuth'
+import { getDefaultRouteForUser } from '@/core/utils/authRoutes'
 import type { Role } from '@/core/constants/roles'
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser'
 
@@ -32,6 +33,7 @@ export function RoleGuard({
   children,
 }: PropsWithChildren<{ allowedRoles: Role[] }>) {
   const { user } = useAuth()
+  const location = useLocation()
 
   if (!user) {
     return <Navigate to={ROUTES.login} replace />
@@ -40,7 +42,13 @@ export function RoleGuard({
   const allowed = user.roles.some((role) => allowedRoles.includes(role))
 
   if (!allowed) {
-    return <Navigate to={ROUTES.dashboard} replace />
+    const fallbackRoute = getDefaultRouteForUser(user)
+
+    if (fallbackRoute === location.pathname) {
+      return <Navigate to={ROUTES.root} replace />
+    }
+
+    return <Navigate to={fallbackRoute} replace />
   }
 
   return children ?? <Outlet />

@@ -1,9 +1,10 @@
+import type { PropsWithChildren } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 
 import { Button } from '@/components/ui/Button'
 import { ROUTES } from '@/core/constants/routes'
 
-export function AuthLayout() {
+export function AuthLayout({ children }: PropsWithChildren) {
   return (
     <div className="auth-layout">
       <div className="auth-hero">
@@ -24,7 +25,7 @@ export function AuthLayout() {
         </Link>
       </div>
       <div className="auth-panel">
-        <Outlet />
+        {children ?? <Outlet />}
       </div>
     </div>
   )

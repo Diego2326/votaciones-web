@@ -1,10 +1,28 @@
 import { apiGet, apiPatch, apiPost, apiPut } from '@/core/api/client'
+import type { PaginatedResponse } from '@/core/types/api'
 import type { Tournament, VoteResults } from '@/core/types/domain'
 import type { TournamentPayload } from '@/features/tournaments/types/tournament.types'
 
+function normalizeTournamentList(
+  payload: Tournament[] | PaginatedResponse<Tournament>,
+) {
+  if (Array.isArray(payload)) {
+    return payload
+  }
+
+  if (Array.isArray(payload.content)) {
+    return payload.content
+  }
+
+  return []
+}
+
 export const tournamentApi = {
-  list() {
-    return apiGet<Tournament[]>('/api/v1/tournaments')
+  async list() {
+    const response = await apiGet<Tournament[] | PaginatedResponse<Tournament>>(
+      '/api/v1/tournaments',
+    )
+    return normalizeTournamentList(response)
   },
   byId(id: string) {
     return apiGet<Tournament>(`/api/v1/tournaments/${id}`)

@@ -1,8 +1,9 @@
+import type { PropsWithChildren } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
 import { ROUTES } from '@/core/constants/routes'
 
-export function VoterLayout() {
+export function VoterLayout({ children }: PropsWithChildren) {
   return (
     <div className="voter-layout">
       <header className="voter-header">
@@ -16,7 +17,7 @@ export function VoterLayout() {
         </nav>
       </header>
       <main className="voter-main">
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
     </div>
   )
