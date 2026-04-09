@@ -26,7 +26,7 @@ export class AppErrorBoundary extends Component<
         <div className="centered-state">
           <div className="panel-card narrow">
             <h1>La aplicacion encontro un error</h1>
-            <p>Recarga la pagina. Si persiste, revisa la integracion del backend.</p>
+            <p>Recarga la pagina e intenta de nuevo.</p>
           </div>
         </div>
       )

@@ -38,10 +38,6 @@ export function DashboardPage() {
         <div className="stack">
           <p className="eyebrow">{isAdmin ? 'Control administrativo' : 'Control del organizador'}</p>
           <h1>{user ? `Hola, ${user.username}` : 'Panel principal'}</h1>
-          <p className="dashboard-hero-copy">
-            Este panel prioriza ejecucion: acceso del votante, progreso de rondas y salida a
-            presentacion sin navegar por menus redundantes.
-          </p>
         </div>
         <div className="dashboard-hero-actions">
           <Link to={ROUTES.tournaments}>
@@ -89,15 +85,12 @@ export function DashboardPage() {
           <div className="workflow-list">
             <Link to={ROUTES.tournamentsNew} className="workflow-link-card">
               <strong>Crear un nuevo torneo</strong>
-              <p>Pasa directo al alta con el contrato correcto del backend.</p>
             </Link>
             <Link to={ROUTES.tournaments} className="workflow-link-card">
               <strong>Entrar a un torneo existente</strong>
-              <p>Abre su workspace y sigue con acceso, participantes o setup.</p>
             </Link>
             <Link to={ROUTES.voteHome} className="workflow-link-card">
               <strong>Revisar experiencia del votante</strong>
-              <p>Comprueba el flujo gamificado de union, combate y voto.</p>
             </Link>
           </div>
         </Card>

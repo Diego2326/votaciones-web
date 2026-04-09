@@ -38,7 +38,6 @@ export function RegisterPage() {
         <div>
           <p className="eyebrow">Onboarding</p>
           <h2>Crear cuenta</h2>
-          <p>Crea tu acceso para gestionar torneos y coordinar la votacion en vivo.</p>
         </div>
         {registerMutation.isError ? (
           <PageError message={toAppError(registerMutation.error).message} />

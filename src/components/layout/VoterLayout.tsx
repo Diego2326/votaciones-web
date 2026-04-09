@@ -14,10 +14,6 @@ export function VoterLayout({ children }: PropsWithChildren) {
         <div className="arena-header-copy">
           <p className="eyebrow">Arena del votante</p>
           <h1>Entra, elige tu bando y define el resultado</h1>
-          <p className="arena-subtitle">
-            Todo el flujo esta pensado como una partida: union rapida, rondas visibles y duelo
-            directo en cada match.
-          </p>
         </div>
         <div className="arena-header-side">
           {session ? (

@@ -28,14 +28,13 @@ export function VoterRoundPage() {
       <div>
         <p className="eyebrow">Combates disponibles</p>
         <h1>Selecciona tu duelo</h1>
-        <p>Elige un enfrentamiento abierto para lanzar tu voto.</p>
       </div>
       <div className="card-grid">
         {matches.length === 0 ? (
           <Card className="arena-mode-card">
             <EmptyState
               title="No hay matches disponibles"
-              description="La ronda aun no tiene enfrentamientos abiertos."
+              description="Sin enfrentamientos."
             />
           </Card>
         ) : (

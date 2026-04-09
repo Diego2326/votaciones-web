@@ -29,7 +29,7 @@ export function VoteMatchPage() {
   if (!matchQuery.data) {
     return (
       <Card>
-        <EmptyState title="Match no encontrado" description="Verifica que la ronda siga activa." />
+        <EmptyState title="Match no encontrado" description="No disponible." />
       </Card>
     )
   }

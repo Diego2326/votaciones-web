@@ -33,9 +33,7 @@ export function VoterTournamentDetailPage() {
           <div className="stack">
             <p className="eyebrow">Arena seleccionada</p>
             <h1>{tournament.name}</h1>
-            <p className="arena-copy">
-              {tournament.description || 'Elige una ronda y entra al siguiente combate disponible.'}
-            </p>
+            {tournament.description ? <p className="arena-copy">{tournament.description}</p> : null}
           </div>
           <Badge tone={tournament.active ? 'success' : 'warning'}>{tournament.status}</Badge>
         </div>
@@ -44,7 +42,7 @@ export function VoterTournamentDetailPage() {
         <Card className="arena-mode-card">
           <EmptyState
             title="Sin rondas"
-            description="El organizador aun no ha publicado rondas para este torneo."
+            description="Sin rondas publicadas."
           />
         </Card>
       ) : (

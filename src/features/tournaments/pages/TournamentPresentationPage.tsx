@@ -86,7 +86,7 @@ function MatchScoreCard({ match }: { match: MatchResults }) {
         <Badge tone={getMatchTone(match)}>{match.status}</Badge>
       </div>
       {match.results.length === 0 ? (
-        <p className="label-muted">Aun no hay votos o resultados publicados.</p>
+        <p className="label-muted">Sin resultados publicados.</p>
       ) : (
         <div className="stack">
           {match.results.map((entry) => {
@@ -127,9 +127,6 @@ function PresentationLobbyStage({
     <section className="presentation-scene presentation-scene-lobby">
       <div className="presentation-scene-copy">
         <h2>Esperando a los participantes</h2>
-        <p className="presentation-copy">
-          Comparte el PIN o proyecta el QR para que entren al torneo.
-        </p>
         <div className="presentation-scene-meta">
           <div className="presentation-meta-pill">
             <span className="label-muted">Activos</span>
@@ -146,7 +143,7 @@ function PresentationLobbyStage({
       <div className="presentation-roster">
         {participants.length === 0 ? (
           <div className="presentation-empty-inline">
-            Aun no hay participantes cargados para mostrar en pantalla.
+            Sin participantes.
           </div>
         ) : (
           participants.map((participant, index) => (
@@ -195,7 +192,7 @@ function PresentationLiveStage({
     return (
       <section className="presentation-scene presentation-scene-live">
         <div className="presentation-empty-inline">
-          Abre o crea una ronda desde el workspace para mostrar resultados en vivo.
+          Sin rondas disponibles.
         </div>
       </section>
     )
@@ -206,9 +203,6 @@ function PresentationLiveStage({
       <div className="presentation-live-header">
         <div>
           <h2>{currentRound.name}</h2>
-          <p className="presentation-copy">
-            Ronda {currentRound.roundNumber} · seguimiento en tiempo real
-          </p>
         </div>
         <Badge tone={currentRound.status === 'OPEN' ? 'success' : 'warning'}>
           {currentRound.status}
@@ -219,7 +213,7 @@ function PresentationLiveStage({
         <div className="presentation-live-main">
           {currentRound.matches.length === 0 ? (
             <div className="presentation-empty-inline">
-              La ronda actual aun no tiene cruces con resultados visibles.
+              Sin cruces con resultados.
             </div>
           ) : (
             <div className="presentation-current-round-grid">
@@ -238,7 +232,7 @@ function PresentationLiveStage({
                 <h3>Marcador acumulado</h3>
               </div>
               {leaderboard.length === 0 ? (
-                <p className="label-muted">Sin acumulado disponible todavia.</p>
+                <p className="label-muted">Sin acumulado.</p>
               ) : (
                 leaderboard.slice(0, 6).map((entry, index) => (
                   <div key={entry.participantId} className="presentation-leader-row">

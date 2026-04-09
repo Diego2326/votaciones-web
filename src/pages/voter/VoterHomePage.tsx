@@ -18,10 +18,6 @@ export function VoterHomePage() {
           <div className="stack">
             <p className="eyebrow">Lobby</p>
             <h2>Tu voto entra como una jugada, no como un formulario</h2>
-            <p className="arena-copy">
-              Une tu sesion, entra al torneo correcto y avanza ronda por ronda hasta emitir tu
-              decision final.
-            </p>
             {code ? (
               <p className="arena-code-chip">Codigo detectado: {formatTournamentCode(code)}</p>
             ) : null}
@@ -57,17 +53,14 @@ export function VoterHomePage() {
         <Card className="arena-mode-card">
           <p className="eyebrow">Modo de juego</p>
           <h2>1. Unete</h2>
-          <p>Usa PIN o QR y abre tu sesion en segundos.</p>
         </Card>
         <Card className="arena-mode-card">
           <p className="eyebrow">Modo de juego</p>
           <h2>2. Elige ronda</h2>
-          <p>Entra directo a la etapa abierta y revisa los duelos disponibles.</p>
         </Card>
         <Card className="arena-mode-card">
           <p className="eyebrow">Modo de juego</p>
           <h2>3. Decide</h2>
-          <p>Vota en el enfrentamiento y sigue el marcador en vivo.</p>
         </Card>
       </div>
     </div>

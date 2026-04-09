@@ -51,7 +51,6 @@ export function LoginPage() {
         <div>
           <p className="eyebrow">Acceso</p>
           <h2>Iniciar sesion</h2>
-          <p>Ingresa al panel para controlar torneos, brackets y votos en vivo.</p>
         </div>
         {loginMutation.isError ? (
           <PageError

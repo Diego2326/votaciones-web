@@ -19,7 +19,7 @@ function getSectionMeta(pathname: string) {
     return {
       eyebrow: 'Organizacion',
       title: 'Portafolio de torneos',
-      description: 'Desde aqui creas, ordenas y auditas los torneos activos.',
+      description: '',
     }
   }
 
@@ -27,7 +27,7 @@ function getSectionMeta(pathname: string) {
     return {
       eyebrow: 'Administracion',
       title: 'Control de usuarios',
-      description: 'Gestion de estado, roles y supervision de accesos.',
+      description: '',
     }
   }
 
@@ -35,14 +35,14 @@ function getSectionMeta(pathname: string) {
     return {
       eyebrow: 'Auditoria',
       title: 'Trazabilidad del sistema',
-      description: 'Actividad clave del producto y acciones sensibles.',
+      description: '',
     }
   }
 
   return {
     eyebrow: 'Control Room',
     title: 'Panel principal',
-    description: 'Resumen rapido del sistema y de los torneos que estas operando.',
+    description: '',
   }
 }
 

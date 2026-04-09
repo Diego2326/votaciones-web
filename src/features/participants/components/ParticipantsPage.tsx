@@ -101,10 +101,6 @@ export function ParticipantsPage() {
       <div>
         <p className="eyebrow">Registro</p>
         <h1>Participantes del torneo</h1>
-        <p>
-          Construye la plantilla real del juego. Aqui subes fotos, activas perfiles y dejas lista
-          la base para emparejar.
-        </p>
       </div>
       <Card>
         {submitError ? (
@@ -132,7 +128,7 @@ export function ParticipantsPage() {
         {participants.length === 0 ? (
           <EmptyState
             title="Sin participantes"
-            description="Registra participantes para poder crear enfrentamientos."
+            description="Registra participantes."
           />
         ) : (
           <Table>

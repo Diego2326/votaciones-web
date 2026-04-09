@@ -118,7 +118,7 @@ export function MatchesPage() {
           <Card>
             <EmptyState
               title="Sin enfrentamientos"
-              description="Crea los primeros matches dentro de esta ronda."
+              description="Sin matches."
             />
           </Card>
         ) : (

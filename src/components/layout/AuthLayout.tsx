@@ -15,10 +15,6 @@ export function AuthLayout({ children }: PropsWithChildren) {
         <div className="auth-copy">
           <p className="eyebrow">Acceso de organizador</p>
           <h1>Administra el torneo en vivo</h1>
-          <p>
-            Entra para abrir rondas, monitorear votos y controlar la experiencia
-            del evento.
-          </p>
         </div>
         <Link to={ROUTES.root} className="auth-home-link">
           <Button variant="secondary">Volver al inicio</Button>

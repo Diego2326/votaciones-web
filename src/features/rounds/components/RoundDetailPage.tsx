@@ -124,7 +124,7 @@ export function RoundDetailPage() {
           ) : (
             <EmptyState
               title="Sin resultados"
-              description="Aun no hay votos o matches en esta ronda."
+              description="Sin resultados."
             />
           )}
         </div>

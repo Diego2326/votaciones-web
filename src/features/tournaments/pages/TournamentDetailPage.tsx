@@ -119,9 +119,7 @@ export function TournamentDetailPage() {
               <Badge tone={tournament.active ? 'success' : 'warning'}>{tournament.status}</Badge>
             </div>
             <h1>{tournament.name}</h1>
-            <p className="workspace-hero-copy">
-              {tournament.description || 'Este torneo ya esta listo para participantes, rondas y votacion.'}
-            </p>
+            {tournament.description ? <p className="workspace-hero-copy">{tournament.description}</p> : null}
           </div>
           <div className="workspace-hero-actions">
             <Link to={ROUTES.tournamentRounds.replace(':id', id)}>
@@ -224,9 +222,6 @@ export function TournamentDetailPage() {
                       width={220}
                       height={220}
                     />
-                    <p className="label-muted">
-                      Este QR siempre apunta al frontend actual para evitar enlaces rotos.
-                    </p>
                   </div>
                 ) : null}
                 <div className="inline-group">
@@ -277,28 +272,24 @@ export function TournamentDetailPage() {
                 <span className="workflow-step-number">1</span>
                 <div>
                   <strong>Define acceso y QR</strong>
-                  <p>Configura el modo de entrada antes de abrir la votacion.</p>
                 </div>
               </div>
               <div className="workflow-step">
                 <span className="workflow-step-number">2</span>
                 <div>
                   <strong>Carga participantes</strong>
-                  <p>{participants.length} participantes registrados hasta ahora.</p>
                 </div>
               </div>
               <div className="workflow-step">
                 <span className="workflow-step-number">3</span>
                 <div>
                   <strong>Define el setup del torneo</strong>
-                  <p>{rounds.length} rondas creadas dentro de la estructura actual.</p>
                 </div>
               </div>
               <div className="workflow-step">
                 <span className="workflow-step-number">4</span>
                 <div>
                   <strong>Abre la presentacion</strong>
-                  <p>Ideal para proyectar resultados y enfrentamientos en vivo.</p>
                 </div>
               </div>
             </div>
@@ -320,7 +311,7 @@ export function TournamentDetailPage() {
           {participants.length === 0 ? (
             <EmptyState
               title="Sin participantes"
-              description="Carga la base del torneo para empezar a emparejar."
+              description="Agrega participantes."
             />
           ) : (
             <div className="workspace-roster">
@@ -358,7 +349,7 @@ export function TournamentDetailPage() {
           {rounds.length === 0 ? (
             <EmptyState
               title="Sin rondas"
-              description="Crea la primera ronda para convertir el torneo en juego real."
+              description="Crea la primera ronda."
             />
           ) : (
             <div className="workspace-round-list">

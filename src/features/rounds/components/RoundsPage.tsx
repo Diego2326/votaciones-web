@@ -63,9 +63,6 @@ export function RoundsPage() {
       <div>
         <p className="eyebrow">Setup</p>
         <h1>Configuracion y rondas</h1>
-        <p>
-          Aqui ajustas el torneo y construyes su estructura base sin cambiar de pantalla.
-        </p>
       </div>
 
       <Card className="workspace-panel">
@@ -73,9 +70,6 @@ export function RoundsPage() {
           <div>
             <p className="eyebrow">Configuracion base</p>
             <h2>Ajustes del torneo</h2>
-            <p className="label-muted">
-              Cambia titulo, tipo, acceso y ventana horaria antes de generar la estructura.
-            </p>
           </div>
           {updateTournamentMutation.isError ? (
             <PageError
@@ -118,23 +112,18 @@ export function RoundsPage() {
             )}
           </div>
 
-          <p className="label-muted">{automaticPlan.note}</p>
-
           <div className="workspace-kpis">
             <div className="workspace-kpi">
               <span className="metric-label">Tipo</span>
               <strong>{tournament.type}</strong>
-              <span className="label-muted">Define la forma base</span>
             </div>
             <div className="workspace-kpi">
               <span className="metric-label">Participantes activos</span>
               <strong>{activeParticipants.length}</strong>
-              <span className="label-muted">{participants.length} cargados en total</span>
             </div>
             <div className="workspace-kpi">
               <span className="metric-label">Rondas sugeridas</span>
               <strong>{automaticPlan.rounds.length}</strong>
-              <span className="label-muted">Plantilla inicial</span>
             </div>
           </div>
 
@@ -177,9 +166,6 @@ export function RoundsPage() {
           <div>
             <p className="eyebrow">Ajuste manual</p>
             <h2>Agregar una ronda extra</h2>
-            <p className="label-muted">
-              Si necesitas una excepcion a la estructura automatica, puedes crear rondas manuales.
-            </p>
           </div>
           {createMutation.isError ? (
             <PageError
@@ -200,7 +186,7 @@ export function RoundsPage() {
           <Card>
             <EmptyState
               title="No hay rondas"
-              description="Genera la estructura automatica o agrega una ronda manual para empezar."
+              description="Genera la estructura."
             />
           </Card>
         ) : (

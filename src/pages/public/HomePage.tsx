@@ -65,10 +65,6 @@ export function HomePage() {
           </div>
         </Card>
       </section>
-
-      <section className="live-footnote">
-        <p>Usa el codigo compartido por el organizador para unirte a la votacion.</p>
-      </section>
     </main>
   )
 }

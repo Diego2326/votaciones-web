@@ -36,13 +36,6 @@ export function TournamentListPage() {
         <div>
           <p className="eyebrow">Organizacion</p>
           <h1>{isAdmin ? 'Torneos visibles' : 'Mis torneos'}</h1>
-          <p>
-            {isAdmin
-              ? 'Como administrador ves la cartera completa del sistema.'
-              : collections.hasOwnershipData
-                ? 'Esta lista solo muestra torneos asociados a tu usuario.'
-                : 'No se pudo verificar la propiedad de los torneos con los datos actuales del backend.'}
-          </p>
         </div>
         <Link to={ROUTES.tournamentsNew}>
           <Button>Crear torneo</Button>
@@ -73,7 +66,7 @@ export function TournamentListPage() {
             description={
               isAdmin
                 ? 'Cuando existan torneos apareceran aqui.'
-                : 'Crea el primero para empezar a administrar setup, participantes y votos.'
+                : 'Crea el primero para empezar.'
             }
           />
         ) : (

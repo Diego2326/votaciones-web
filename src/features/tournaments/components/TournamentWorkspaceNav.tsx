@@ -21,9 +21,6 @@ export function TournamentWorkspaceNav({
       <div className="workspace-copy">
         <p className="eyebrow">Workspace del torneo</p>
         <h2>{tournamentName ?? 'Centro de control'}</h2>
-        <p className="workspace-description">
-          Gestiona participantes, setup del torneo y la vista de presentacion desde un solo bloque.
-        </p>
       </div>
       <nav className="workspace-nav">
         {items.map((item) => (

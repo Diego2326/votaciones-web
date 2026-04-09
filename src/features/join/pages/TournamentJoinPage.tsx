@@ -40,7 +40,7 @@ export function TournamentJoinPage() {
       <Card className="arena-mode-card">
         <EmptyState
           title="Falta el acceso"
-          description="Ingresa con un PIN o abre el enlace QR del torneo."
+          description="Ingresa con PIN o QR."
         />
       </Card>
     )
@@ -87,7 +87,6 @@ export function TournamentJoinPage() {
         <div>
           <p className="eyebrow">Checkpoint de ingreso</p>
           <h1>Unirse a la votacion</h1>
-          <p>Modo activo: {accessInfo.mode}</p>
           <p className="arena-code-chip">PIN {accessInfo.joinPin}</p>
         </div>
         {activeMutationError ? (
