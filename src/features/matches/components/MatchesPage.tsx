@@ -15,6 +15,7 @@ import { toAppError } from '@/core/utils/errors'
 import { useRound } from '@/features/rounds/hooks/useRounds'
 import { useTournament } from '@/features/tournaments/hooks/useTournament'
 import { canManageTournament } from '@/features/tournaments/utils/ownership'
+import { buildEliminationAutoMatchPlan } from '@/features/matches/utils/eliminationAutoMatch'
 
 export function MatchesPage() {
   const { id = '' } = useParams()
@@ -57,6 +58,14 @@ export function MatchesPage() {
       label: participant.name,
     })) ?? []
   const matches = matchesQuery.data ?? []
+  const isEliminationTournament = tournamentQuery.data?.type === 'ELIMINATION'
+  const eliminationAutoPlan = isEliminationTournament
+    ? buildEliminationAutoMatchPlan({
+        participants: roundParticipantsQuery.data ?? [],
+        matches,
+      })
+    : null
+  const createErrorMessage = createMutation.isError ? toAppError(createMutation.error).message : null
 
   return (
     <div className="stack">
@@ -74,13 +83,30 @@ export function MatchesPage() {
             ) : null}
             <Button
               variant="secondary"
-              disabled={createMutation.isPending}
-              onClick={() => createMutation.mutate({ autoGenerate: true })}
+              disabled={createMutation.isPending || Boolean(isEliminationTournament && !eliminationAutoPlan?.payload)}
+              onClick={() => {
+                if (isEliminationTournament) {
+                  if (!eliminationAutoPlan?.payload) {
+                    return
+                  }
+
+                  createMutation.mutate(eliminationAutoPlan.payload)
+                  return
+                }
+
+                createMutation.mutate({ autoGenerate: true })
+              }}
             >
-              Generar automaticamente
+              {isEliminationTournament ? 'Generar siguiente duelo' : 'Generar automaticamente'}
             </Button>
           </div>
         </div>
+        {isEliminationTournament && eliminationAutoPlan?.message ? (
+          <p className="label-muted">{eliminationAutoPlan.message}</p>
+        ) : null}
+        {createErrorMessage ? (
+          <PageError title="No se pudo crear el match" message={createErrorMessage} />
+        ) : null}
         <MatchForm
           participantOptions={participantOptions}
           isSubmitting={createMutation.isPending}

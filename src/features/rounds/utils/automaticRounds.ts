@@ -63,11 +63,11 @@ function getBracketRoundName(totalRounds: number, roundNumber: number) {
   return BRACKET_STAGE_NAMES[stageFromEnd] ?? `Ronda ${roundNumber}`
 }
 
-function buildEliminationRounds(participantCount: number) {
+function buildBracketRounds(participantCount: number) {
   if (participantCount < 2) {
     return {
       rounds: [],
-      note: 'Los torneos de eliminacion y bracket necesitan una llave real para calcular fases.',
+      note: 'Los torneos bracket necesitan una llave real para calcular fases.',
       requirementMessage: 'Necesitas al menos 2 participantes activos para generar la estructura.',
     } satisfies AutomaticRoundPlan
   }
@@ -85,6 +85,26 @@ function buildEliminationRounds(participantCount: number) {
   return {
     rounds,
     note: `Se calcularon ${totalRounds} rondas segun ${participantCount} participantes activos.`,
+  } satisfies AutomaticRoundPlan
+}
+
+function buildEliminationRounds(participantCount: number) {
+  if (participantCount < 2) {
+    return {
+      rounds: [],
+      note: 'El modo eliminacion necesita al menos 2 participantes para arrancar.',
+      requirementMessage: 'Necesitas al menos 2 participantes activos para generar la estructura.',
+    } satisfies AutomaticRoundPlan
+  }
+
+  return {
+    rounds: [
+      {
+        name: 'Eliminacion continua',
+        roundNumber: 1,
+      },
+    ],
+    note: 'En eliminacion se crea un duelo por vez: el ganador sigue y el perdedor queda fuera.',
   } satisfies AutomaticRoundPlan
 }
 
@@ -122,9 +142,17 @@ export function buildAutomaticRoundPlan(
         note: 'Los torneos por rondas arrancan con una secuencia base de 3 jornadas.',
       }
 
-    case 'ELIMINATION':
-    case 'BRACKET': {
+    case 'ELIMINATION': {
       const plan = buildEliminationRounds(participantCount)
+
+      return {
+        ...plan,
+        rounds: withDistributedSchedule(plan.rounds, tournament.startAt, tournament.endAt),
+      }
+    }
+
+    case 'BRACKET': {
+      const plan = buildBracketRounds(participantCount)
 
       return {
         ...plan,
