@@ -1,4 +1,5 @@
 import type { Tournament, User } from '@/core/types/domain'
+import { isAdminUser } from '@/features/tournaments/utils/ownership'
 
 interface TournamentCollections {
   hasOwnershipData: boolean
@@ -13,7 +14,7 @@ export function getTournamentCollections(
 ): TournamentCollections {
   const hasOwnershipData = tournaments.some((tournament) => Boolean(tournament.organizerId))
 
-  if (!user || !hasOwnershipData) {
+  if (!user) {
     return {
       hasOwnershipData,
       mine: tournaments,
@@ -22,13 +23,30 @@ export function getTournamentCollections(
     }
   }
 
+  if (isAdminUser(user)) {
+    return {
+      hasOwnershipData,
+      mine: tournaments,
+      others: [],
+      visible: tournaments,
+    }
+  }
+
+  if (!hasOwnershipData) {
+    return {
+      hasOwnershipData,
+      mine: [],
+      others: [],
+      visible: [],
+    }
+  }
+
   const mine = tournaments.filter((tournament) => tournament.organizerId === user.id)
-  const others = tournaments.filter((tournament) => tournament.organizerId !== user.id)
 
   return {
     hasOwnershipData,
     mine,
-    others,
+    others: [],
     visible: mine,
   }
 }

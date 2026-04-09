@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
@@ -13,9 +14,11 @@ import type { RoundPayload } from '@/features/rounds/types/round.types'
 export function RoundForm({
   onSubmit,
   isSubmitting = false,
+  defaultRoundNumber = 1,
 }: {
   onSubmit: (values: RoundPayload) => void
   isSubmitting?: boolean
+  defaultRoundNumber?: number
 }) {
   const toInstant = (value: string) => {
     if (!value.trim()) {
@@ -34,16 +37,26 @@ export function RoundForm({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RoundSchema>({
     resolver: zodResolver(roundSchema),
     defaultValues: {
       name: '',
-      roundNumber: 1,
+      roundNumber: defaultRoundNumber,
       opensAt: '',
       closesAt: '',
     },
   })
+
+  useEffect(() => {
+    reset({
+      name: '',
+      roundNumber: defaultRoundNumber,
+      opensAt: '',
+      closesAt: '',
+    })
+  }, [defaultRoundNumber, reset])
 
   return (
     <form

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { useAuthStore } from '@/app/store/auth.store'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { PageError } from '@/components/feedback/PageError'
 import { Badge } from '@/components/ui/Badge'
@@ -23,10 +24,27 @@ import { tournamentApi } from '@/features/tournaments/api/tournamentApi'
 import { TournamentWorkspaceNav } from '@/features/tournaments/components/TournamentWorkspaceNav'
 import { useTournament } from '@/features/tournaments/hooks/useTournament'
 import { TOURNAMENT_ACCESS_MODES } from '@/features/tournaments/types/tournament.types'
+import { canManageTournament } from '@/features/tournaments/utils/ownership'
 import { useTournamentLiveUpdates } from '@/features/websocket/hooks/useTournamentLiveUpdates'
+
+function getTournamentActionErrorTitle(action?: 'publish' | 'activate' | 'pause' | 'close') {
+  switch (action) {
+    case 'publish':
+      return 'No se pudo publicar el torneo'
+    case 'activate':
+      return 'No se pudo activar el torneo'
+    case 'pause':
+      return 'No se pudo pausar el torneo'
+    case 'close':
+      return 'No se pudo cerrar el torneo'
+    default:
+      return 'No se pudo ejecutar la accion'
+  }
+}
 
 export function TournamentDetailPage() {
   const { id = '' } = useParams()
+  const user = useAuthStore((state) => state.user)
   const tournamentQuery = useTournament(id)
   const participantsQuery = useParticipants(id)
   const roundsQuery = useRounds(id)
@@ -70,6 +88,16 @@ export function TournamentDetailPage() {
   }
 
   const tournament = tournamentQuery.data
+
+  if (!canManageTournament(user, tournament)) {
+    return (
+      <PageError
+        title="No puedes administrar este torneo"
+        message="Los organizadores solo pueden ver y editar torneos propios."
+      />
+    )
+  }
+
   const participants = participantsQuery.data ?? []
   const rounds = roundsQuery.data ?? []
   const accessMode = draftAccessMode ?? accessQuery.data?.mode ?? 'ANONYMOUS'
@@ -96,8 +124,8 @@ export function TournamentDetailPage() {
             </p>
           </div>
           <div className="workspace-hero-actions">
-            <Link to={ROUTES.tournamentEdit.replace(':id', id)}>
-              <Button variant="secondary">Editar torneo</Button>
+            <Link to={ROUTES.tournamentRounds.replace(':id', id)}>
+              <Button variant="secondary">Abrir setup</Button>
             </Link>
             <Link to={ROUTES.tournamentPresentation.replace(':id', id)} target="_blank" rel="noreferrer">
               <Button>Presentar</Button>
@@ -138,6 +166,12 @@ export function TournamentDetailPage() {
             Cerrar
           </Button>
         </div>
+        {actionMutation.isError ? (
+          <PageError
+            title={getTournamentActionErrorTitle(actionMutation.variables)}
+            message={toAppError(actionMutation.error).message}
+          />
+        ) : null}
         {event ? (
           <div className="live-pill">
             Evento en vivo: {event.type} · {new Date(event.emittedAt).toLocaleString()}
@@ -256,8 +290,8 @@ export function TournamentDetailPage() {
               <div className="workflow-step">
                 <span className="workflow-step-number">3</span>
                 <div>
-                  <strong>Construye rondas y matches</strong>
-                  <p>{rounds.length} rondas creadas para este torneo.</p>
+                  <strong>Define el setup del torneo</strong>
+                  <p>{rounds.length} rondas creadas dentro de la estructura actual.</p>
                 </div>
               </div>
               <div className="workflow-step">
@@ -314,11 +348,11 @@ export function TournamentDetailPage() {
         <Card className="workspace-panel">
           <div className="page-header">
             <div>
-              <p className="eyebrow">Rondas</p>
-              <h2>Mapa operativo</h2>
+              <p className="eyebrow">Setup</p>
+              <h2>Estructura actual</h2>
             </div>
             <Link to={ROUTES.tournamentRounds.replace(':id', id)}>
-              <Button variant="ghost">Abrir rondas</Button>
+              <Button variant="ghost">Abrir setup</Button>
             </Link>
           </div>
           {rounds.length === 0 ? (

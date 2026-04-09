@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
+import { useAuthStore } from '@/app/store/auth.store'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { PageError } from '@/components/feedback/PageError'
 import { Button } from '@/components/ui/Button'
@@ -15,25 +16,43 @@ import {
   useRound,
   useRoundResults,
 } from '@/features/rounds/hooks/useRounds'
+import { useTournament } from '@/features/tournaments/hooks/useTournament'
+import { canManageTournament } from '@/features/tournaments/utils/ownership'
 
 export function RoundDetailPage() {
   const { id = '' } = useParams()
+  const user = useAuthStore((state) => state.user)
   const roundQuery = useRound(id)
   const resultsQuery = useRoundResults(id)
+  const tournamentQuery = useTournament(roundQuery.data?.tournamentId ?? '')
   const openMutation = useOpenRound(id)
   const closeMutation = useCloseRound(id)
   const processMutation = useProcessRound(id)
   const publishMutation = usePublishRoundResults(id)
 
-  if (roundQuery.isLoading || resultsQuery.isLoading) {
+  if (roundQuery.isLoading || resultsQuery.isLoading || tournamentQuery.isLoading) {
     return <Loader label="Cargando ronda..." />
   }
 
-  if (roundQuery.isError || resultsQuery.isError || !roundQuery.data) {
-    return <PageError message={toAppError(roundQuery.error ?? resultsQuery.error).message} />
+  if (roundQuery.isError || resultsQuery.isError || tournamentQuery.isError || !roundQuery.data) {
+    return (
+      <PageError
+        message={toAppError(roundQuery.error ?? resultsQuery.error ?? tournamentQuery.error).message}
+      />
+    )
   }
 
   const round = roundQuery.data
+
+  if (!canManageTournament(user, tournamentQuery.data)) {
+    return (
+      <PageError
+        title="No puedes administrar esta ronda"
+        message="Los organizadores solo pueden ver rondas de torneos propios."
+      />
+    )
+  }
+
   const results = resultsQuery.data
 
   return (

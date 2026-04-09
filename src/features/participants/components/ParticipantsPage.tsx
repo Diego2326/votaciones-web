@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
+import { useAuthStore } from '@/app/store/auth.store'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { PageError } from '@/components/feedback/PageError'
 import { Badge } from '@/components/ui/Badge'
@@ -26,10 +27,12 @@ import {
 import type { ParticipantPayload } from '@/features/participants/types/participant.types'
 import { useTournament } from '@/features/tournaments/hooks/useTournament'
 import { TournamentWorkspaceNav } from '@/features/tournaments/components/TournamentWorkspaceNav'
+import { canManageTournament } from '@/features/tournaments/utils/ownership'
 import { uploadImageToImgur } from '@/features/uploads/api/imgurApi'
 
 export function ParticipantsPage() {
   const { id = '' } = useParams()
+  const user = useAuthStore((state) => state.user)
   const [editingParticipantId, setEditingParticipantId] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isUploadingImage, setIsUploadingImage] = useState(false)
@@ -49,6 +52,16 @@ export function ParticipantsPage() {
 
   const participants = participantsQuery.data ?? []
   const tournament = tournamentQuery.data
+
+  if (!canManageTournament(user, tournament)) {
+    return (
+      <PageError
+        title="No puedes administrar este torneo"
+        message="Los organizadores solo pueden ver y editar torneos propios."
+      />
+    )
+  }
+
   const editingParticipant =
     participants.find((participant) => participant.id === editingParticipantId) ?? null
 

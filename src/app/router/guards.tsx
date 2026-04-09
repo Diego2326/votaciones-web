@@ -32,17 +32,23 @@ export function RoleGuard({
   allowedRoles,
   children,
 }: PropsWithChildren<{ allowedRoles: Role[] }>) {
-  const { user } = useAuth()
+  const { user, accessToken } = useAuth()
+  const currentUserQuery = useCurrentUser()
   const location = useLocation()
+  const effectiveUser = user ?? currentUserQuery.data ?? null
 
-  if (!user) {
+  if (!effectiveUser && accessToken && (currentUserQuery.isLoading || currentUserQuery.isFetching)) {
+    return <Loader label="Restaurando permisos..." />
+  }
+
+  if (!effectiveUser) {
     return <Navigate to={ROUTES.login} replace />
   }
 
-  const allowed = user.roles.some((role) => allowedRoles.includes(role))
+  const allowed = effectiveUser.roles.some((role) => allowedRoles.includes(role))
 
   if (!allowed) {
-    const fallbackRoute = getDefaultRouteForUser(user)
+    const fallbackRoute = getDefaultRouteForUser(effectiveUser)
 
     if (fallbackRoute === location.pathname) {
       return <Navigate to={ROUTES.root} replace />

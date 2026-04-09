@@ -5,8 +5,7 @@ import { ROUTES } from '@/core/constants/routes'
 const items = [
   { key: 'overview', label: 'Centro', route: ROUTES.tournamentDetail },
   { key: 'participants', label: 'Participantes', route: ROUTES.tournamentParticipants },
-  { key: 'rounds', label: 'Rondas', route: ROUTES.tournamentRounds },
-  { key: 'edit', label: 'Configuracion', route: ROUTES.tournamentEdit },
+  { key: 'rounds', label: 'Setup', route: ROUTES.tournamentRounds },
   { key: 'presentation', label: 'Presentacion', route: ROUTES.tournamentPresentation },
 ] as const
 
@@ -23,7 +22,7 @@ export function TournamentWorkspaceNav({
         <p className="eyebrow">Workspace del torneo</p>
         <h2>{tournamentName ?? 'Centro de control'}</h2>
         <p className="workspace-description">
-          Gestiona acceso, participantes, rondas y la vista de presentacion desde un solo bloque.
+          Gestiona participantes, setup del torneo y la vista de presentacion desde un solo bloque.
         </p>
       </div>
       <nav className="workspace-nav">

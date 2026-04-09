@@ -11,6 +11,7 @@ import { toAppError } from '@/core/utils/errors'
 import { TournamentTable } from '@/features/tournaments/components/TournamentTable'
 import { useTournaments } from '@/features/tournaments/hooks/useTournaments'
 import { getTournamentCollections } from '@/features/tournaments/utils/tournamentCollections'
+import { isAdminUser } from '@/features/tournaments/utils/ownership'
 
 export function TournamentListPage() {
   const user = useAuthStore((state) => state.user)
@@ -27,18 +28,20 @@ export function TournamentListPage() {
   const tournaments = tournamentsQuery.data ?? []
   const collections = getTournamentCollections(tournaments, user)
   const myTournaments = collections.mine
-  const otherTournaments = collections.others
+  const isAdmin = isAdminUser(user)
 
   return (
     <div className="stack">
       <div className="page-header">
         <div>
           <p className="eyebrow">Organizacion</p>
-          <h1>Mis torneos</h1>
+          <h1>{isAdmin ? 'Torneos visibles' : 'Mis torneos'}</h1>
           <p>
-            {collections.hasOwnershipData
-              ? 'Esta lista muestra los torneos asociados a tu usuario.'
-              : 'El backend no siempre devuelve el organizador; mientras tanto se muestran los torneos disponibles en tu sesion.'}
+            {isAdmin
+              ? 'Como administrador ves la cartera completa del sistema.'
+              : collections.hasOwnershipData
+                ? 'Esta lista solo muestra torneos asociados a tu usuario.'
+                : 'No se pudo verificar la propiedad de los torneos con los datos actuales del backend.'}
           </p>
         </div>
         <Link to={ROUTES.tournamentsNew}>
@@ -66,25 +69,17 @@ export function TournamentListPage() {
       <Card>
         {myTournaments.length === 0 ? (
           <EmptyState
-            title="Todavia no tienes torneos"
-            description="Crea el primero para empezar a administrar rondas, participantes y votos."
+            title={isAdmin ? 'No hay torneos visibles' : 'Todavia no tienes torneos'}
+            description={
+              isAdmin
+                ? 'Cuando existan torneos apareceran aqui.'
+                : 'Crea el primero para empezar a administrar setup, participantes y votos.'
+            }
           />
         ) : (
           <TournamentTable tournaments={myTournaments} />
         )}
       </Card>
-      {collections.hasOwnershipData && otherTournaments.length > 0 ? (
-        <Card>
-          <div className="stack">
-            <div>
-              <p className="eyebrow">Referencia</p>
-              <h2>Otros torneos visibles</h2>
-              <p>Se muestran aparte para no mezclar tu trabajo con el de otros organizadores.</p>
-            </div>
-            <TournamentTable tournaments={otherTournaments} />
-          </div>
-        </Card>
-      ) : null}
     </div>
   )
 }

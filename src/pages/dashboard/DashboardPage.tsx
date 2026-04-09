@@ -9,6 +9,7 @@ import { ROUTES } from '@/core/constants/routes'
 import { toAppError } from '@/core/utils/errors'
 import { useTournaments } from '@/features/tournaments/hooks/useTournaments'
 import { getTournamentCollections } from '@/features/tournaments/utils/tournamentCollections'
+import { isAdminUser } from '@/features/tournaments/utils/ownership'
 
 export function DashboardPage() {
   const user = useAuthStore((state) => state.user)
@@ -25,6 +26,7 @@ export function DashboardPage() {
   const tournaments = tournamentsQuery.data ?? []
   const collections = getTournamentCollections(tournaments, user)
   const myTournaments = collections.mine
+  const isAdmin = isAdminUser(user)
   const activeTournaments = myTournaments.filter((tournament) => tournament.active)
   const draftTournaments = myTournaments.filter((tournament) => tournament.status === 'DRAFT')
   const liveTournaments = myTournaments.filter((tournament) => tournament.status === 'ACTIVE')
@@ -34,7 +36,7 @@ export function DashboardPage() {
     <div className="stack">
       <Card className="dashboard-hero">
         <div className="stack">
-          <p className="eyebrow">Control del organizador</p>
+          <p className="eyebrow">{isAdmin ? 'Control administrativo' : 'Control del organizador'}</p>
           <h1>{user ? `Hola, ${user.username}` : 'Panel principal'}</h1>
           <p className="dashboard-hero-copy">
             Este panel prioriza ejecucion: acceso del votante, progreso de rondas y salida a
@@ -53,9 +55,11 @@ export function DashboardPage() {
 
       <div className="stats-grid">
         <Card className="dashboard-highlight">
-          <p className="metric-label">Mis torneos</p>
+          <p className="metric-label">{isAdmin ? 'Torneos visibles' : 'Mis torneos'}</p>
           <p className="metric-value">{myTournaments.length}</p>
-          <p className="label-muted">Espacios bajo tu operacion directa</p>
+          <p className="label-muted">
+            {isAdmin ? 'Cartera completa disponible en la sesion actual' : 'Espacios bajo tu operacion directa'}
+          </p>
         </Card>
         <Card className="dashboard-highlight">
           <p className="metric-label">En vivo</p>
@@ -89,7 +93,7 @@ export function DashboardPage() {
             </Link>
             <Link to={ROUTES.tournaments} className="workflow-link-card">
               <strong>Entrar a un torneo existente</strong>
-              <p>Abre su workspace y sigue con acceso, participantes o rondas.</p>
+              <p>Abre su workspace y sigue con acceso, participantes o setup.</p>
             </Link>
             <Link to={ROUTES.voteHome} className="workflow-link-card">
               <strong>Revisar experiencia del votante</strong>
@@ -106,7 +110,9 @@ export function DashboardPage() {
             </div>
           </div>
           {latestTournaments.length === 0 ? (
-            <p className="label-muted">Todavia no tienes torneos cargados.</p>
+            <p className="label-muted">
+              {isAdmin ? 'Todavia no hay torneos visibles en el sistema.' : 'Todavia no tienes torneos cargados.'}
+            </p>
           ) : (
             <div className="dashboard-list">
               {latestTournaments.map((tournament) => (

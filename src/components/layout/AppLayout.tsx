@@ -10,8 +10,8 @@ function getSectionMeta(pathname: string) {
   if (pathname.startsWith('/tournaments/')) {
     return {
       eyebrow: 'Workspace',
-      title: 'Operacion de torneo',
-      description: 'Acciones, estructura y acceso reunidos en un mismo flujo.',
+      title: 'Torneo en curso',
+      description: '',
     }
   }
 
@@ -51,75 +51,54 @@ export function AppLayout({ children }: PropsWithChildren) {
   const user = useAuthStore((state) => state.user)
   const clearSession = useAuthStore((state) => state.clearSession)
   const sectionMeta = getSectionMeta(location.pathname)
-  const navGroups = useMemo(() => {
-    const tournamentLinks = [
+  const topbarLinks = useMemo(() => {
+    const links: Array<{ to: string; label: string }> = [
       { to: ROUTES.dashboard, label: 'Dashboard' },
       { to: ROUTES.tournaments, label: 'Torneos' },
     ]
 
-    const governanceLinks = []
-
     if (user?.roles.includes(ROLES.ADMIN)) {
-      governanceLinks.push({ to: ROUTES.users, label: 'Usuarios' })
+      links.push({ to: ROUTES.users, label: 'Usuarios' })
     }
 
     if (user?.roles.includes(ROLES.ADMIN) || user?.roles.includes(ROLES.ORGANIZER)) {
-      governanceLinks.push({ to: ROUTES.audit, label: 'Auditoria' })
+      links.push({ to: ROUTES.audit, label: 'Auditoria' })
     }
 
-    return [
-      { title: 'Operacion', links: tournamentLinks },
-      { title: 'Gobierno', links: governanceLinks },
-    ].filter((group) => group.links.length > 0)
+    return links
   }, [user?.roles])
 
   return (
     <div className="shell-layout">
-      <aside className="sidebar">
-        <div className="sidebar-brand">
-          <p className="eyebrow">Control room</p>
-          <h2>Votaciones Arena</h2>
-          <p className="sidebar-copy">
-            Organiza torneos, ejecuta rondas y abre una presentacion lista para pantalla grande.
-          </p>
-        </div>
-        <div className="sidebar-quick-actions">
-          <Link to={ROUTES.tournamentsNew}>
-            <Button fullWidth>Nuevo torneo</Button>
-          </Link>
-          <Link to={ROUTES.voteHome}>
-            <Button variant="ghost" fullWidth>
-              Portal votante
-            </Button>
-          </Link>
-        </div>
-        <div className="sidebar-groups">
-          {navGroups.map((group) => (
-            <section key={group.title} className="sidebar-group">
-              <p className="sidebar-group-title">{group.title}</p>
-              <nav className="sidebar-nav">
-                {group.links.map((link) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
-              </nav>
-            </section>
-          ))}
-        </div>
-      </aside>
-      <div className="shell-main">
+      <div className="shell-main shell-main-full">
         <header className="topbar topbar-rich">
-          <div>
+          <div className="topbar-context">
             <p className="topbar-kicker">{sectionMeta.eyebrow}</p>
             <p className="topbar-title">{sectionMeta.title}</p>
-            <p className="topbar-subtitle">{sectionMeta.description}</p>
+            {sectionMeta.description ? <p className="topbar-subtitle">{sectionMeta.description}</p> : null}
           </div>
+          <nav className="topbar-nav">
+            {topbarLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                className={({ isActive }) =>
+                  isActive ? 'topbar-nav-link active' : 'topbar-nav-link'
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
           <div className="topbar-actions">
+            <div className="topbar-cta">
+              <Link to={ROUTES.tournamentsNew}>
+                <Button>Nuevo torneo</Button>
+              </Link>
+              <Link to={ROUTES.voteHome}>
+                <Button variant="ghost">Portal votante</Button>
+              </Link>
+            </div>
             <div className="topbar-user-card">
               <span className="topbar-user-label">{user?.roles.join(' · ') ?? 'Sin rol'}</span>
               <strong>{user?.fullName ?? user?.username ?? 'Sin sesion'}</strong>

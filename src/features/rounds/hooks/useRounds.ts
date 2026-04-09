@@ -30,6 +30,26 @@ export function useCreateRound(tournamentId: string) {
   })
 }
 
+export function useGenerateRounds(tournamentId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (payloads: RoundPayload[]) => {
+      const createdRounds = []
+
+      for (const payload of payloads) {
+        createdRounds.push(await roundApi.create(tournamentId, payload))
+      }
+
+      return createdRounds
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ['rounds', tournamentId] })
+      void queryClient.invalidateQueries({ queryKey: ['tournaments', tournamentId] })
+    },
+  })
+}
+
 export function useRoundResults(id: string) {
   return useQuery({
     queryKey: ['round-results', id],

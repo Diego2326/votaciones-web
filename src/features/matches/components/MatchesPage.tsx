@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
+import { useAuthStore } from '@/app/store/auth.store'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/feedback/EmptyState'
 import { PageError } from '@/components/feedback/PageError'
@@ -12,23 +13,40 @@ import { useAssignWinner, useCreateMatch, useMatches } from '@/features/matches/
 import { useParticipants } from '@/features/participants/hooks/useParticipants'
 import { toAppError } from '@/core/utils/errors'
 import { useRound } from '@/features/rounds/hooks/useRounds'
+import { useTournament } from '@/features/tournaments/hooks/useTournament'
+import { canManageTournament } from '@/features/tournaments/utils/ownership'
 
 export function MatchesPage() {
   const { id = '' } = useParams()
+  const user = useAuthStore((state) => state.user)
   const matchesQuery = useMatches(id)
   const createMutation = useCreateMatch(id)
   const assignWinnerMutation = useAssignWinner(id)
   const roundQuery = useRound(id)
+  const tournamentQuery = useTournament(roundQuery.data?.tournamentId ?? '')
   const roundParticipantsQuery = useParticipants(roundQuery.data?.tournamentId ?? '')
 
-  if (matchesQuery.isLoading || roundQuery.isLoading || roundParticipantsQuery.isLoading) {
+  if (matchesQuery.isLoading || roundQuery.isLoading || roundParticipantsQuery.isLoading || tournamentQuery.isLoading) {
     return <Loader label="Cargando enfrentamientos..." />
   }
 
-  if (matchesQuery.isError || roundQuery.isError || roundParticipantsQuery.isError) {
+  if (matchesQuery.isError || roundQuery.isError || roundParticipantsQuery.isError || tournamentQuery.isError) {
     return (
       <PageError
-        message={toAppError(matchesQuery.error ?? roundQuery.error ?? roundParticipantsQuery.error).message}
+        message={
+          toAppError(
+            matchesQuery.error ?? roundQuery.error ?? roundParticipantsQuery.error ?? tournamentQuery.error,
+          ).message
+        }
+      />
+    )
+  }
+
+  if (!canManageTournament(user, tournamentQuery.data)) {
+    return (
+      <PageError
+        title="No puedes administrar estos matches"
+        message="Los organizadores solo pueden ver matches de torneos propios."
       />
     )
   }
