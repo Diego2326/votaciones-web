@@ -17,6 +17,20 @@ export function RoundForm({
   onSubmit: (values: RoundPayload) => void
   isSubmitting?: boolean
 }) {
+  const toInstant = (value: string) => {
+    if (!value.trim()) {
+      return undefined
+    }
+
+    const parsed = new Date(value)
+
+    if (Number.isNaN(parsed.getTime())) {
+      return undefined
+    }
+
+    return parsed.toISOString()
+  }
+
   const {
     register,
     handleSubmit,
@@ -25,27 +39,56 @@ export function RoundForm({
     resolver: zodResolver(roundSchema),
     defaultValues: {
       name: '',
-      sequence: 1,
+      roundNumber: 1,
+      opensAt: '',
+      closesAt: '',
     },
   })
 
   return (
     <form
       className="form-grid columns-2"
-      onSubmit={handleSubmit((values) =>
-        onSubmit({
+      onSubmit={handleSubmit((values) => {
+        const payload: RoundPayload = {
           name: values.name,
-          sequence: values.sequence,
-        })
-      )}
+          roundNumber: values.roundNumber,
+        }
+
+        const opensAt = toInstant(values.opensAt)
+        const closesAt = toInstant(values.closesAt)
+
+        if (opensAt) {
+          payload.opensAt = opensAt
+        }
+
+        if (closesAt) {
+          payload.closesAt = closesAt
+        }
+
+        onSubmit(payload)
+      })}
     >
       <Input id="round-name" label="Nombre" error={errors.name?.message} {...register('name')} />
       <Input
-        id="round-sequence"
+        id="round-number"
         type="number"
-        label="Secuencia"
-        error={errors.sequence?.message}
-        {...register('sequence', { valueAsNumber: true })}
+        label="Numero de ronda"
+        error={errors.roundNumber?.message}
+        {...register('roundNumber', { valueAsNumber: true })}
+      />
+      <Input
+        id="round-opens-at"
+        type="datetime-local"
+        label="Apertura"
+        error={errors.opensAt?.message}
+        {...register('opensAt')}
+      />
+      <Input
+        id="round-closes-at"
+        type="datetime-local"
+        label="Cierre"
+        error={errors.closesAt?.message}
+        {...register('closesAt')}
       />
       <FormActions>
         <Button type="submit" disabled={isSubmitting}>

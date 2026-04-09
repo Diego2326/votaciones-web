@@ -4,6 +4,9 @@ export interface User {
   id: string
   username: string
   email: string
+  firstName?: string
+  lastName?: string
+  fullName?: string
   enabled: boolean
   roles: Role[]
   createdAt?: string
@@ -14,7 +17,7 @@ export interface AuthTokens {
   accessToken: string
   refreshToken: string
   tokenType?: string
-  expiresIn?: number
+  expiresInSeconds?: number
 }
 
 export interface AuthResponse {
@@ -32,20 +35,37 @@ export type TournamentStatus =
   | 'DRAFT'
   | 'PUBLISHED'
   | 'ACTIVE'
+  | 'PAUSED'
   | 'CLOSED'
   | 'FINISHED'
   | 'CANCELLED'
 
+export type TournamentType = 'ELIMINATION' | 'ROUND_BASED' | 'POLL' | 'BRACKET'
+
+export type TournamentAccessMode = 'EMAIL_PASSWORD' | 'DISPLAY_NAME' | 'ANONYMOUS'
+
+export interface TournamentCreator {
+  id: string
+  username: string
+  fullName?: string | null
+}
+
 export interface Tournament {
   id: string
   name: string
+  title: string
+  type: TournamentType
   description: string | null
+  accessMode: TournamentAccessMode
+  startAt?: string | null
+  endAt?: string | null
   status: TournamentStatus
   published: boolean
   active: boolean
   createdAt?: string
   updatedAt?: string
   organizerId?: string
+  createdBy?: TournamentCreator | null
 }
 
 export interface Participant {
@@ -53,8 +73,9 @@ export interface Participant {
   tournamentId: string
   name: string
   description?: string | null
+  imageUrl?: string | null
   seed?: number | null
-  active?: boolean
+  active: boolean
 }
 
 export type RoundStatus =
@@ -69,50 +90,114 @@ export interface Round {
   id: string
   tournamentId: string
   name: string
+  roundNumber: number
   sequence: number
   status: RoundStatus
   opensAt?: string | null
   closesAt?: string | null
+  resultsPublishedAt?: string | null
+  createdAt?: string
+  updatedAt?: string
 }
 
 export type MatchStatus = 'PENDING' | 'OPEN' | 'CLOSED' | 'RESOLVED'
 
+export interface MatchParticipant {
+  id: string
+  name: string
+  imageUrl?: string | null
+  active?: boolean
+}
+
 export interface Match {
   id: string
   roundId: string
+  participantA?: MatchParticipant | null
+  participantB?: MatchParticipant | null
+  winner?: MatchParticipant | null
   participantAId: string | null
   participantBId: string | null
   participantAName?: string | null
   participantBName?: string | null
+  winnerId?: string | null
   winnerParticipantId?: string | null
   status: MatchStatus
-  votesA?: number
-  votesB?: number
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Vote {
   id: string
+  tournamentId?: string
+  roundId?: string
   matchId: string
   voterId?: string | null
+  joinSessionId?: string | null
   participantId: string
+  selectedParticipantId: string
   createdAt?: string
 }
 
-export interface VoteResults {
+export interface MatchResultEntry {
+  participantId: string
+  participantName: string
+  votes: number
+}
+
+export interface MatchResults {
   matchId: string
+  status: MatchStatus
+  winnerId?: string | null
   totalVotes: number
-  winnerParticipantId?: string | null
-  entries: Array<{
-    participantId: string
-    participantName: string
-    voteCount: number
-  }>
+  results: MatchResultEntry[]
+}
+
+export interface RoundResults {
+  roundId: string
+  tournamentId: string
+  status: RoundStatus
+  matches: MatchResults[]
+}
+
+export interface TournamentResults {
+  tournamentId: string
+  status: TournamentStatus
+  rounds: RoundResults[]
 }
 
 export interface MyVote {
   hasVoted: boolean
+  selectedParticipantId?: string | null
   participantId?: string | null
   votedAt?: string | null
+}
+
+export interface TournamentAccess {
+  tournamentId: string
+  mode: TournamentAccessMode
+  joinPin: string
+  qrToken: string
+  joinUrl: string
+}
+
+export interface TournamentSession {
+  tournamentId: string
+  tournamentTitle: string
+  mode: TournamentAccessMode
+  sessionToken: string
+  displayName?: string | null
+  userId?: string | null
+  joinedAt: string
+  expiresAt?: string | null
+}
+
+export interface TournamentSessionProfile {
+  sessionId: string
+  tournamentId: string
+  displayName?: string | null
+  userId?: string | null
+  joinedAt: string
+  lastSeenAt?: string | null
 }
 
 export interface AuditLog {

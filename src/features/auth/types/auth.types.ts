@@ -1,4 +1,3 @@
-import type { Role } from '@/core/constants/roles'
 import type { AuthResponse } from '@/core/types/domain'
 
 export interface LoginInput {
@@ -12,7 +11,6 @@ export interface RegisterInput {
   password: string
   firstName: string
   lastName: string
-  roles: Role[]
 }
 
 export type AuthPayload = AuthResponse

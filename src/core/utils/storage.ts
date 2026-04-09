@@ -1,6 +1,8 @@
 export const storageKeys = {
   accessToken: 'votaciones.accessToken',
   refreshToken: 'votaciones.refreshToken',
+  tournamentSessionToken: 'votaciones.tournamentSessionToken',
+  tournamentSession: 'votaciones.tournamentSession',
 } as const
 
 export const storage = {
@@ -16,5 +18,9 @@ export const storage = {
   clearAuth() {
     this.remove(storageKeys.accessToken)
     this.remove(storageKeys.refreshToken)
+  },
+  clearTournamentSession() {
+    this.remove(storageKeys.tournamentSessionToken)
+    this.remove(storageKeys.tournamentSession)
   },
 }

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { useAuthStore } from '@/app/store/auth.store'
+import { toAppError } from '@/core/utils/errors'
 import { authApi } from '@/features/auth/api/authApi'
 
 export function useCurrentUser() {
@@ -24,10 +25,15 @@ export function useCurrentUser() {
   }, [query.data, setUser])
 
   useEffect(() => {
-    if (query.isError) {
+    if (
+      !user &&
+      accessToken &&
+      query.isError &&
+      [401, 403].includes(toAppError(query.error).status ?? 0)
+    ) {
       clearSession()
     }
-  }, [clearSession, query.isError])
+  }, [accessToken, clearSession, query.error, query.isError, user])
 
   return query
 }

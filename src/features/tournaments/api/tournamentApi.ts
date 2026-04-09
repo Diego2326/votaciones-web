@@ -1,48 +1,71 @@
 import { apiGet, apiPatch, apiPost, apiPut } from '@/core/api/client'
 import type { PaginatedResponse } from '@/core/types/api'
-import type { Tournament, VoteResults } from '@/core/types/domain'
+import type {
+  TournamentAccess,
+  TournamentResults,
+  TournamentAccessMode,
+} from '@/core/types/domain'
 import type { TournamentPayload } from '@/features/tournaments/types/tournament.types'
-
-function normalizeTournamentList(
-  payload: Tournament[] | PaginatedResponse<Tournament>,
-) {
-  if (Array.isArray(payload)) {
-    return payload
-  }
-
-  if (Array.isArray(payload.content)) {
-    return payload.content
-  }
-
-  return []
-}
+import {
+  normalizeTournament,
+  normalizeTournamentCollection,
+  type ApiTournament,
+} from '@/features/tournaments/utils/normalizeTournament'
 
 export const tournamentApi = {
   async list() {
-    const response = await apiGet<Tournament[] | PaginatedResponse<Tournament>>(
+    const response = await apiGet<ApiTournament[] | PaginatedResponse<ApiTournament>>(
       '/api/v1/tournaments',
     )
-    return normalizeTournamentList(response)
+    return normalizeTournamentCollection(response)
   },
-  byId(id: string) {
-    return apiGet<Tournament>(`/api/v1/tournaments/${id}`)
+  async byId(id: string) {
+    const response = await apiGet<ApiTournament>(`/api/v1/tournaments/${id}`)
+    return normalizeTournament(response)
   },
-  create(payload: TournamentPayload) {
-    return apiPost<Tournament, TournamentPayload>('/api/v1/tournaments', payload)
+  async create(payload: TournamentPayload) {
+    const response = await apiPost<ApiTournament, TournamentPayload>(
+      '/api/v1/tournaments',
+      payload,
+    )
+    return normalizeTournament(response)
   },
-  update(id: string, payload: TournamentPayload) {
-    return apiPut<Tournament, TournamentPayload>(`/api/v1/tournaments/${id}`, payload)
+  async update(id: string, payload: TournamentPayload) {
+    const response = await apiPut<ApiTournament, TournamentPayload>(
+      `/api/v1/tournaments/${id}`,
+      payload,
+    )
+    return normalizeTournament(response)
   },
-  publish(id: string) {
-    return apiPatch<Tournament>(`/api/v1/tournaments/${id}/publish`)
+  async publish(id: string) {
+    const response = await apiPatch<ApiTournament>(`/api/v1/tournaments/${id}/publish`)
+    return normalizeTournament(response)
   },
-  activate(id: string) {
-    return apiPatch<Tournament>(`/api/v1/tournaments/${id}/activate`)
+  async activate(id: string) {
+    const response = await apiPatch<ApiTournament>(`/api/v1/tournaments/${id}/activate`)
+    return normalizeTournament(response)
   },
-  close(id: string) {
-    return apiPatch<Tournament>(`/api/v1/tournaments/${id}/close`)
+  async pause(id: string) {
+    const response = await apiPatch<ApiTournament>(`/api/v1/tournaments/${id}/pause`)
+    return normalizeTournament(response)
+  },
+  async close(id: string) {
+    const response = await apiPatch<ApiTournament>(`/api/v1/tournaments/${id}/close`)
+    return normalizeTournament(response)
+  },
+  access(id: string) {
+    return apiGet<TournamentAccess>(`/api/v1/tournaments/${id}/access`)
+  },
+  updateAccess(id: string, mode: TournamentAccessMode) {
+    return apiPatch<TournamentAccess, { mode: TournamentAccessMode }>(
+      `/api/v1/tournaments/${id}/access`,
+      { mode },
+    )
+  },
+  regeneratePin(id: string) {
+    return apiPatch<TournamentAccess>(`/api/v1/tournaments/${id}/regenerate-pin`)
   },
   results(id: string) {
-    return apiGet<VoteResults>(`/api/v1/tournaments/${id}/results`)
+    return apiGet<TournamentResults>(`/api/v1/tournaments/${id}/results`)
   },
 }

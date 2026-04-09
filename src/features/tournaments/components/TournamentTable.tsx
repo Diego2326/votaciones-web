@@ -58,7 +58,10 @@ export function TournamentTable({
             <TableCell>
               <TableActions>
                 <Link to={`/tournaments/${tournament.id}`}>
-                  <Button variant="secondary">Ver detalle</Button>
+                  <Button variant="secondary">Workspace</Button>
+                </Link>
+                <Link to={`/tournaments/${tournament.id}/presentation`} target="_blank" rel="noreferrer">
+                  <Button variant="ghost">Presentar</Button>
                 </Link>
                 <Link to={`/tournaments/${tournament.id}/edit`}>
                   <Button variant="ghost">Editar</Button>

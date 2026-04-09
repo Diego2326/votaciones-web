@@ -22,7 +22,7 @@ export function HomePage() {
       return
     }
 
-    navigate(`${ROUTES.voteTournaments}?code=${encodeURIComponent(nextCode)}`)
+    navigate(`${ROUTES.voteJoin}?pin=${encodeURIComponent(nextCode)}`)
   }
 
   return (

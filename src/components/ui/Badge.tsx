@@ -1,10 +1,11 @@
 import clsx from 'clsx'
+import type { ReactNode } from 'react'
 
 export function Badge({
   children,
   tone = 'neutral',
 }: {
-  children: string
+  children: ReactNode
   tone?: 'neutral' | 'success' | 'warning' | 'danger'
 }) {
   return <span className={clsx('badge', `badge-${tone}`)}>{children}</span>

@@ -1,19 +1,30 @@
 import { apiDelete, apiGet, apiPost, apiPut } from '@/core/api/client'
-import type { Participant } from '@/core/types/domain'
 import type { ParticipantPayload } from '@/features/participants/types/participant.types'
+import {
+  normalizeParticipant,
+  type ApiParticipant,
+} from '@/features/participants/utils/normalizeParticipant'
 
 export const participantApi = {
-  list(tournamentId: string) {
-    return apiGet<Participant[]>(`/api/v1/tournaments/${tournamentId}/participants`)
+  async list(tournamentId: string) {
+    const response = await apiGet<ApiParticipant[]>(
+      `/api/v1/tournaments/${tournamentId}/participants`,
+    )
+    return response.map(normalizeParticipant)
   },
-  create(tournamentId: string, payload: ParticipantPayload) {
-    return apiPost<Participant, ParticipantPayload>(
+  async create(tournamentId: string, payload: ParticipantPayload) {
+    const response = await apiPost<ApiParticipant, ParticipantPayload>(
       `/api/v1/tournaments/${tournamentId}/participants`,
       payload,
     )
+    return normalizeParticipant(response)
   },
-  update(id: string, payload: ParticipantPayload) {
-    return apiPut<Participant, ParticipantPayload>(`/api/v1/participants/${id}`, payload)
+  async update(id: string, payload: ParticipantPayload) {
+    const response = await apiPut<ApiParticipant, ParticipantPayload>(
+      `/api/v1/participants/${id}`,
+      payload,
+    )
+    return normalizeParticipant(response)
   },
   remove(id: string) {
     return apiDelete<void>(`/api/v1/participants/${id}`)

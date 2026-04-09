@@ -18,6 +18,20 @@ export function useCreateMatch(roundId: string) {
     mutationFn: (payload: MatchPayload) => matchApi.create(roundId, payload),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['matches', roundId] })
+      void queryClient.invalidateQueries({ queryKey: ['round', roundId] })
+    },
+  })
+}
+
+export function useAssignWinner(roundId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, winnerId }: { id: string; winnerId: string }) =>
+      matchApi.assignWinner(id, winnerId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['matches', roundId] })
+      void queryClient.invalidateQueries({ queryKey: ['round-results', roundId] })
     },
   })
 }

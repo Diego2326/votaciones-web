@@ -1,21 +1,28 @@
 import { apiGet, apiPatch, apiPost } from '@/core/api/client'
-import type { Match } from '@/core/types/domain'
 import type { MatchPayload } from '@/features/matches/types/match.types'
+import { normalizeMatch, type ApiMatch } from '@/features/matches/utils/normalizeMatch'
 
 export const matchApi = {
-  list(roundId: string) {
-    return apiGet<Match[]>(`/api/v1/rounds/${roundId}/matches`)
+  async list(roundId: string) {
+    const response = await apiGet<ApiMatch[]>(`/api/v1/rounds/${roundId}/matches`)
+    return response.map(normalizeMatch)
   },
-  byId(id: string) {
-    return apiGet<Match>(`/api/v1/matches/${id}`)
+  async byId(id: string) {
+    const response = await apiGet<ApiMatch>(`/api/v1/matches/${id}`)
+    return normalizeMatch(response)
   },
-  create(roundId: string, payload: MatchPayload) {
-    return apiPost<Match, MatchPayload>(`/api/v1/rounds/${roundId}/matches`, payload)
-  },
-  assignWinner(id: string, winnerParticipantId: string) {
-    return apiPatch<Match, { winnerParticipantId: string }>(
-      `/api/v1/matches/${id}/winner`,
-      { winnerParticipantId },
+  async create(roundId: string, payload: MatchPayload) {
+    const response = await apiPost<ApiMatch[], MatchPayload>(
+      `/api/v1/rounds/${roundId}/matches`,
+      payload,
     )
+    return response.map(normalizeMatch)
+  },
+  async assignWinner(id: string, winnerId: string) {
+    const response = await apiPatch<ApiMatch, { winnerId: string }>(
+      `/api/v1/matches/${id}/winner`,
+      { winnerId },
+    )
+    return normalizeMatch(response)
   },
 }

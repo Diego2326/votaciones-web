@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { FormActions } from '@/components/forms/FormActions'
-import { ROLES } from '@/core/constants/roles'
 import { PageError } from '@/components/feedback/PageError'
 import { ROUTES } from '@/core/constants/routes'
 import { toAppError } from '@/core/utils/errors'
@@ -46,12 +45,7 @@ export function RegisterPage() {
         ) : null}
         <form
           className="form-grid columns-2"
-          onSubmit={handleSubmit((values) =>
-            registerMutation.mutate({
-              ...values,
-              roles: [ROLES.ORGANIZER],
-            })
-          )}
+          onSubmit={handleSubmit((values) => registerMutation.mutate(values))}
         >
           <Input
             id="firstName"

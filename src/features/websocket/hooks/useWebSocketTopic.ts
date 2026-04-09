@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 import { useAuthStore } from '@/app/store/auth.store'
+import type { WebSocketEvent } from '@/core/types/domain'
 import { websocketService } from '@/features/websocket/services/websocketService'
 
 export function useWebSocketTopic(
@@ -8,20 +9,22 @@ export function useWebSocketTopic(
   callback: (payload: unknown) => void,
 ) {
   const accessToken = useAuthStore((state) => state.accessToken)
+  const onMessage = useEffectEvent((payload: WebSocketEvent) => {
+    callback(payload)
+  })
 
   useEffect(() => {
     if (!destination) {
       return
     }
 
-    const client = websocketService.connect(accessToken ?? undefined)
-    const subscription = websocketService.subscribe(destination, callback)
+    const subscription = websocketService.subscribe(destination, (payload) => {
+      onMessage(payload)
+    })
+    websocketService.connect(accessToken ?? undefined)
 
     return () => {
-      subscription?.unsubscribe()
-      if (!client.connected) {
-        websocketService.disconnect()
-      }
+      subscription.unsubscribe()
     }
-  }, [accessToken, callback, destination])
+  }, [accessToken, destination])
 }

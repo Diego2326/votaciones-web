@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
+import { EmptyState } from '@/components/feedback/EmptyState'
 import { PageError } from '@/components/feedback/PageError'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -11,55 +13,103 @@ import {
   useProcessRound,
   usePublishRoundResults,
   useRound,
+  useRoundResults,
 } from '@/features/rounds/hooks/useRounds'
 
 export function RoundDetailPage() {
   const { id = '' } = useParams()
   const roundQuery = useRound(id)
+  const resultsQuery = useRoundResults(id)
   const openMutation = useOpenRound(id)
   const closeMutation = useCloseRound(id)
   const processMutation = useProcessRound(id)
   const publishMutation = usePublishRoundResults(id)
 
-  if (roundQuery.isLoading) {
+  if (roundQuery.isLoading || resultsQuery.isLoading) {
     return <Loader label="Cargando ronda..." />
   }
 
-  if (roundQuery.isError || !roundQuery.data) {
-    return <PageError message={toAppError(roundQuery.error).message} />
+  if (roundQuery.isError || resultsQuery.isError || !roundQuery.data) {
+    return <PageError message={toAppError(roundQuery.error ?? resultsQuery.error).message} />
   }
 
   const round = roundQuery.data
+  const results = resultsQuery.data
 
   return (
-    <Card>
-      <div className="stack">
-        <div className="page-header">
-          <div>
-            <p className="eyebrow">Ronda</p>
-            <h1>{round.name}</h1>
+    <div className="stack">
+      <Card>
+        <div className="stack">
+          <div className="page-header">
+            <div>
+              <p className="eyebrow">Ronda</p>
+              <h1>{round.name}</h1>
+              <p className="label-muted">
+                #{round.roundNumber} · {round.opensAt ? `Abierta ${round.opensAt}` : 'Sin apertura'}
+              </p>
+            </div>
+            <strong>{round.status}</strong>
           </div>
-          <strong>{round.status}</strong>
+          <div className="inline-group">
+            <Link to={`/tournaments/${round.tournamentId}/rounds`}>
+              <Button variant="ghost">Volver a rondas</Button>
+            </Link>
+            <Link to={`/tournaments/${round.tournamentId}/presentation`} target="_blank" rel="noreferrer">
+              <Button variant="secondary">Abrir presentacion</Button>
+            </Link>
+          </div>
+          <div className="table-actions">
+            <Button onClick={() => openMutation.mutate()} disabled={openMutation.isPending}>
+              Abrir
+            </Button>
+            <Button onClick={() => closeMutation.mutate()} disabled={closeMutation.isPending}>
+              Cerrar
+            </Button>
+            <Button onClick={() => processMutation.mutate()} disabled={processMutation.isPending}>
+              Procesar
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => publishMutation.mutate()}
+              disabled={publishMutation.isPending}
+            >
+              Publicar resultados
+            </Button>
+            <Link to={`/rounds/${id}/matches`}>
+              <Button variant="ghost">Ver matches</Button>
+            </Link>
+          </div>
         </div>
-        <div className="table-actions">
-          <Button onClick={() => openMutation.mutate()} disabled={openMutation.isPending}>
-            Abrir
-          </Button>
-          <Button onClick={() => closeMutation.mutate()} disabled={closeMutation.isPending}>
-            Cerrar
-          </Button>
-          <Button onClick={() => processMutation.mutate()} disabled={processMutation.isPending}>
-            Procesar
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => publishMutation.mutate()}
-            disabled={publishMutation.isPending}
-          >
-            Publicar resultados
-          </Button>
+      </Card>
+      <Card>
+        <div className="stack">
+          <div>
+            <p className="eyebrow">Resultados</p>
+            <h2>Estado de la ronda</h2>
+          </div>
+          {results && results.matches.length > 0 ? (
+            results.matches.map((match) => (
+              <div key={match.matchId} className="stack">
+                <div className="split-line">
+                  <strong>{match.matchId}</strong>
+                  <span>{match.status}</span>
+                </div>
+                {match.results.map((entry) => (
+                  <div key={entry.participantId} className="split-line">
+                    <span>{entry.participantName}</span>
+                    <span>{entry.votes} votos</span>
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <EmptyState
+              title="Sin resultados"
+              description="Aun no hay votos o matches en esta ronda."
+            />
+          )}
         </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   )
 }

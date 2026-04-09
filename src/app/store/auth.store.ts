@@ -27,12 +27,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     storage.set(storageKeys.accessToken, accessToken)
     storage.set(storageKeys.refreshToken, refreshToken)
 
-    set({
+    set((state) => ({
       accessToken,
       refreshToken,
-      user: user ?? null,
+      user: user ?? state.user,
       hydrated: true,
-    })
+    }))
   },
   setUser: (user) => set({ user }),
   clearSession: () => {

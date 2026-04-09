@@ -32,7 +32,19 @@ export function MatchForm({
   })
 
   return (
-    <form className="form-grid columns-2" onSubmit={handleSubmit((values) => onSubmit(values))}>
+    <form
+      className="form-grid columns-2"
+      onSubmit={handleSubmit((values) =>
+        onSubmit({
+          matches: [
+            {
+              participantAId: values.participantAId,
+              participantBId: values.participantBId,
+            },
+          ],
+        })
+      )}
+    >
       <Select
         id="participantAId"
         label="Participante A"

@@ -1,30 +1,41 @@
 import { apiGet, apiPatch, apiPost } from '@/core/api/client'
-import type { Round, VoteResults } from '@/core/types/domain'
+import type { RoundResults } from '@/core/types/domain'
 import type { RoundPayload } from '@/features/rounds/types/round.types'
+import { normalizeRound, type ApiRound } from '@/features/rounds/utils/normalizeRound'
 
 export const roundApi = {
-  list(tournamentId: string) {
-    return apiGet<Round[]>(`/api/v1/tournaments/${tournamentId}/rounds`)
+  async list(tournamentId: string) {
+    const response = await apiGet<ApiRound[]>(`/api/v1/tournaments/${tournamentId}/rounds`)
+    return response.map(normalizeRound)
   },
-  byId(id: string) {
-    return apiGet<Round>(`/api/v1/rounds/${id}`)
+  async byId(id: string) {
+    const response = await apiGet<ApiRound>(`/api/v1/rounds/${id}`)
+    return normalizeRound(response)
   },
-  create(tournamentId: string, payload: RoundPayload) {
-    return apiPost<Round, RoundPayload>(`/api/v1/tournaments/${tournamentId}/rounds`, payload)
+  async create(tournamentId: string, payload: RoundPayload) {
+    const response = await apiPost<ApiRound, RoundPayload>(
+      `/api/v1/tournaments/${tournamentId}/rounds`,
+      payload,
+    )
+    return normalizeRound(response)
   },
-  open(id: string) {
-    return apiPatch<Round>(`/api/v1/rounds/${id}/open`)
+  async open(id: string) {
+    const response = await apiPatch<ApiRound>(`/api/v1/rounds/${id}/open`)
+    return normalizeRound(response)
   },
-  close(id: string) {
-    return apiPatch<Round>(`/api/v1/rounds/${id}/close`)
+  async close(id: string) {
+    const response = await apiPatch<ApiRound>(`/api/v1/rounds/${id}/close`)
+    return normalizeRound(response)
   },
-  process(id: string) {
-    return apiPatch<Round>(`/api/v1/rounds/${id}/process`)
+  async process(id: string) {
+    const response = await apiPatch<ApiRound>(`/api/v1/rounds/${id}/process`)
+    return normalizeRound(response)
   },
-  publishResults(id: string) {
-    return apiPatch<Round>(`/api/v1/rounds/${id}/publish-results`)
+  async publishResults(id: string) {
+    const response = await apiPatch<ApiRound>(`/api/v1/rounds/${id}/publish-results`)
+    return normalizeRound(response)
   },
   results(id: string) {
-    return apiGet<VoteResults>(`/api/v1/rounds/${id}/results`)
+    return apiGet<RoundResults>(`/api/v1/rounds/${id}/results`)
   },
 }

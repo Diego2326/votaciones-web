@@ -1,11 +1,19 @@
 import { apiGet } from '@/core/api/client'
-import type { AuditLog } from '@/core/types/domain'
+import type { PaginatedResponse } from '@/core/types/api'
+import {
+  normalizeAuditCollection,
+  type ApiAuditLog,
+} from '@/features/audit/utils/normalizeAudit'
 
 export const auditApi = {
-  list() {
-    return apiGet<AuditLog[]>('/api/v1/audit')
+  async list() {
+    const response = await apiGet<ApiAuditLog[] | PaginatedResponse<ApiAuditLog>>('/api/v1/audit')
+    return normalizeAuditCollection(response)
   },
-  byTournament(tournamentId: string) {
-    return apiGet<AuditLog[]>(`/api/v1/tournaments/${tournamentId}/audit`)
+  async byTournament(tournamentId: string) {
+    const response = await apiGet<ApiAuditLog[] | PaginatedResponse<ApiAuditLog>>(
+      `/api/v1/tournaments/${tournamentId}/audit`,
+    )
+    return normalizeAuditCollection(response)
   },
 }

@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
 
 import { useAuthStore } from '@/app/store/auth.store'
+import { PageError } from '@/components/feedback/PageError'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Loader } from '@/components/ui/Loader'
-import { PageError } from '@/components/feedback/PageError'
 import { ROUTES } from '@/core/constants/routes'
 import { toAppError } from '@/core/utils/errors'
 import { useTournaments } from '@/features/tournaments/hooks/useTournaments'
+import { getTournamentCollections } from '@/features/tournaments/utils/tournamentCollections'
 
 export function DashboardPage() {
   const user = useAuthStore((state) => state.user)
@@ -22,87 +23,108 @@ export function DashboardPage() {
   }
 
   const tournaments = tournamentsQuery.data ?? []
-  const myTournaments = tournaments.filter(
-    (tournament) => !user?.id || !tournament.organizerId || tournament.organizerId === user.id,
-  )
-  const activeTournaments = myTournaments.filter((tournament) => tournament.active).length
+  const collections = getTournamentCollections(tournaments, user)
+  const myTournaments = collections.mine
+  const activeTournaments = myTournaments.filter((tournament) => tournament.active)
+  const draftTournaments = myTournaments.filter((tournament) => tournament.status === 'DRAFT')
+  const liveTournaments = myTournaments.filter((tournament) => tournament.status === 'ACTIVE')
+  const latestTournaments = [...myTournaments].slice(0, 4)
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}
-    >
-      <section
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '16px',
-          alignItems: 'flex-end',
-          padding: '24px',
-          borderRadius: '24px',
-          background: 'linear-gradient(135deg, #123a7a 0%, #0b1f49 58%, #08142f 100%)',
-          color: '#f8fafc',
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <p style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '0.12em' }}>
-            Panel del organizador
-          </p>
-          <h1 style={{ margin: 0 }}>{user ? `Hola, ${user.username}` : 'Dashboard'}</h1>
-          <p style={{ margin: 0, maxWidth: '720px', color: 'rgba(226, 232, 240, 0.9)' }}>
-            Este es un marcador visible del nuevo dashboard. Si ves esto, ya estamos
-            editando la pantalla correcta.
+    <div className="stack">
+      <Card className="dashboard-hero">
+        <div className="stack">
+          <p className="eyebrow">Control del organizador</p>
+          <h1>{user ? `Hola, ${user.username}` : 'Panel principal'}</h1>
+          <p className="dashboard-hero-copy">
+            Este panel prioriza ejecucion: acceso del votante, progreso de rondas y salida a
+            presentacion sin navegar por menus redundantes.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="dashboard-hero-actions">
           <Link to={ROUTES.tournaments}>
-            <Button variant="ghost">Ver mis torneos</Button>
+            <Button variant="secondary">Ver torneos</Button>
           </Link>
           <Link to={ROUTES.tournamentsNew}>
-            <Button>Nuevo torneo</Button>
+            <Button>Crear torneo</Button>
           </Link>
         </div>
-      </section>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '16px',
-        }}
-      >
-        <Card>
+      </Card>
+
+      <div className="stats-grid">
+        <Card className="dashboard-highlight">
           <p className="metric-label">Mis torneos</p>
           <p className="metric-value">{myTournaments.length}</p>
+          <p className="label-muted">Espacios bajo tu operacion directa</p>
         </Card>
-        <Card>
-          <p className="metric-label">Activos</p>
-          <p className="metric-value">{activeTournaments}</p>
+        <Card className="dashboard-highlight">
+          <p className="metric-label">En vivo</p>
+          <p className="metric-value">{liveTournaments.length}</p>
+          <p className="label-muted">Actualmente abiertos a votacion</p>
         </Card>
-        <Card>
+        <Card className="dashboard-highlight">
+          <p className="metric-label">Borradores</p>
+          <p className="metric-value">{draftTournaments.length}</p>
+          <p className="label-muted">Pendientes de estructurar o publicar</p>
+        </Card>
+        <Card className="dashboard-highlight">
           <p className="metric-label">Activos</p>
-          <p className="metric-value">{activeTournaments}</p>
+          <p className="metric-value">{activeTournaments.length}</p>
+          <p className="label-muted">Con interaccion real o listos para show</p>
         </Card>
       </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '16px',
-        }}
-      >
-        <Card>
-          <p className="eyebrow">Comprobacion</p>
-          <h2>Dashboard nuevo activo</h2>
-          <p>Usuario: {user?.username ?? 'Sin usuario cargado'}</p>
-          <p>Total de torneos cargados: {tournaments.length}</p>
+
+      <div className="detail-grid">
+        <Card className="workspace-panel">
+          <div className="page-header">
+            <div>
+              <p className="eyebrow">Acciones rapidas</p>
+              <h2>Siguiente mejor paso</h2>
+            </div>
+          </div>
+          <div className="workflow-list">
+            <Link to={ROUTES.tournamentsNew} className="workflow-link-card">
+              <strong>Crear un nuevo torneo</strong>
+              <p>Pasa directo al alta con el contrato correcto del backend.</p>
+            </Link>
+            <Link to={ROUTES.tournaments} className="workflow-link-card">
+              <strong>Entrar a un torneo existente</strong>
+              <p>Abre su workspace y sigue con acceso, participantes o rondas.</p>
+            </Link>
+            <Link to={ROUTES.voteHome} className="workflow-link-card">
+              <strong>Revisar experiencia del votante</strong>
+              <p>Comprueba el flujo gamificado de union, combate y voto.</p>
+            </Link>
+          </div>
         </Card>
-        <Card>
-          <p className="eyebrow">Siguiente paso</p>
-          <h2>Entrar a torneos</h2>
-          <p>Desde aqui deberias poder saltar al listado y luego crear o editar.</p>
+
+        <Card className="workspace-panel">
+          <div className="page-header">
+            <div>
+              <p className="eyebrow">Radar</p>
+              <h2>Torneos a mano</h2>
+            </div>
+          </div>
+          {latestTournaments.length === 0 ? (
+            <p className="label-muted">Todavia no tienes torneos cargados.</p>
+          ) : (
+            <div className="dashboard-list">
+              {latestTournaments.map((tournament) => (
+                <Link
+                  key={tournament.id}
+                  to={ROUTES.tournamentDetail.replace(':id', tournament.id)}
+                  className="workspace-round-card"
+                >
+                  <div>
+                    <p className="eyebrow">{tournament.type}</p>
+                    <strong>{tournament.name}</strong>
+                    <p className="label-muted">{tournament.description ?? 'Sin descripcion'}</p>
+                  </div>
+                  <span className="label-muted">{tournament.status}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>

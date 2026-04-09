@@ -5,9 +5,10 @@ import axios, {
 } from 'axios'
 
 import { useAuthStore } from '@/app/store/auth.store'
+import { useJoinStore } from '@/app/store/join.store'
 import { env } from '@/core/config/env'
 import type { ApiErrorResponse, ApiResponse } from '@/core/types/api'
-import type { AuthResponse } from '@/core/types/domain'
+import type { AuthApiResponse, AuthResponse } from '@/core/types/domain'
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -23,6 +24,10 @@ export const apiClient = axios.create({
   baseURL: env.apiUrl,
 })
 
+export const sessionClient = axios.create({
+  baseURL: env.apiUrl,
+})
+
 const unwrap = <T>(response: { data: ApiResponse<T> | T }) =>
   response.data as ApiResponse<T> | T
 
@@ -31,6 +36,14 @@ function hasEnvelope<T>(payload: ApiResponse<T> | T): payload is ApiResponse<T> 
 }
 
 let refreshPromise: Promise<string | null> | null = null
+
+function normalizeAuthResponse(payload: AuthApiResponse): AuthResponse {
+  return {
+    accessToken: payload.tokens.accessToken,
+    refreshToken: payload.tokens.refreshToken,
+    user: payload.user,
+  }
+}
 
 async function refreshAccessToken() {
   const refreshToken = useAuthStore.getState().refreshToken
@@ -42,10 +55,11 @@ async function refreshAccessToken() {
 
   if (!refreshPromise) {
     refreshPromise = unauthenticatedClient
-      .post<ApiResponse<AuthResponse>>('/api/v1/auth/refresh', { refreshToken })
+      .post<ApiResponse<AuthApiResponse>>('/api/v1/auth/refresh', { refreshToken })
       .then((response) => {
-        const payload = unwrap<AuthResponse>(response)
-        const session = 'data' in payload ? payload.data : payload
+        const payload = unwrap<AuthApiResponse>(response)
+        const authPayload = 'data' in payload ? payload.data : payload
+        const session = normalizeAuthResponse(authPayload)
         useAuthStore.getState().setSession(session)
         return session.accessToken
       })
@@ -72,6 +86,16 @@ function attachAuth(config: InternalAxiosRequestConfig) {
 }
 
 apiClient.interceptors.request.use(attachAuth)
+
+sessionClient.interceptors.request.use((config) => {
+  const sessionToken = useJoinStore.getState().sessionToken
+
+  if (sessionToken) {
+    config.headers.set('X-Tournament-Session', sessionToken)
+  }
+
+  return config
+})
 
 apiClient.interceptors.response.use(
   (response) => response,

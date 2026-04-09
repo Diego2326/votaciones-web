@@ -1,18 +1,33 @@
 import { apiGet, apiPatch } from '@/core/api/client'
-import type { User } from '@/core/types/domain'
+import type { PaginatedResponse } from '@/core/types/api'
 import type { UserRolesPayload, UserStatusPayload } from '@/features/users/types/user.types'
+import {
+  normalizeUser,
+  normalizeUserCollection,
+  type ApiUser,
+} from '@/features/users/utils/normalizeUser'
 
 export const userApi = {
-  list() {
-    return apiGet<User[]>('/api/v1/users')
+  async list() {
+    const response = await apiGet<ApiUser[] | PaginatedResponse<ApiUser>>('/api/v1/users')
+    return normalizeUserCollection(response)
   },
-  byId(id: string) {
-    return apiGet<User>(`/api/v1/users/${id}`)
+  async byId(id: string) {
+    const response = await apiGet<ApiUser>(`/api/v1/users/${id}`)
+    return normalizeUser(response)
   },
-  updateStatus(id: string, payload: UserStatusPayload) {
-    return apiPatch<User, UserStatusPayload>(`/api/v1/users/${id}/status`, payload)
+  async updateStatus(id: string, payload: UserStatusPayload) {
+    const response = await apiPatch<ApiUser, UserStatusPayload>(
+      `/api/v1/users/${id}/status`,
+      payload,
+    )
+    return normalizeUser(response)
   },
-  updateRoles(id: string, payload: UserRolesPayload) {
-    return apiPatch<User, UserRolesPayload>(`/api/v1/users/${id}/roles`, payload)
+  async updateRoles(id: string, payload: UserRolesPayload) {
+    const response = await apiPatch<ApiUser, UserRolesPayload>(
+      `/api/v1/users/${id}/roles`,
+      payload,
+    )
+    return normalizeUser(response)
   },
 }

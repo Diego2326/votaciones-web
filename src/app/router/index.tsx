@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { AuthLayout } from '@/components/layout/AuthLayout'
 import { AppLayout } from '@/components/layout/AppLayout'
@@ -15,14 +15,15 @@ import { TournamentListPage } from '@/features/tournaments/pages/TournamentListP
 import { TournamentCreatePage } from '@/features/tournaments/pages/TournamentCreatePage'
 import { TournamentDetailPage } from '@/features/tournaments/pages/TournamentDetailPage'
 import { TournamentEditPage } from '@/features/tournaments/pages/TournamentEditPage'
+import { TournamentPresentationPage } from '@/features/tournaments/pages/TournamentPresentationPage'
 import { ParticipantsPage } from '@/features/participants/components/ParticipantsPage'
 import { RoundsPage } from '@/features/rounds/components/RoundsPage'
 import { RoundDetailPage } from '@/features/rounds/components/RoundDetailPage'
 import { MatchesPage } from '@/features/matches/components/MatchesPage'
 import { UsersPage } from '@/features/users/pages/UsersPage'
 import { AuditPage } from '@/features/audit/pages/AuditPage'
+import { TournamentJoinPage } from '@/features/join/pages/TournamentJoinPage'
 import { VoterHomePage } from '@/pages/voter/VoterHomePage'
-import { VoterTournamentListPage } from '@/features/votes/components/VoterTournamentListPage'
 import { VoterTournamentDetailPage } from '@/features/votes/components/VoterTournamentDetailPage'
 import { VoterRoundPage } from '@/features/votes/components/VoterRoundPage'
 import { VoteMatchPage } from '@/features/votes/components/VoteMatchPage'
@@ -39,6 +40,23 @@ function AppShellPage({
       </RoleGuard>
     </ProtectedRoute>
   )
+}
+
+function StandaloneProtectedPage({
+  allowedRoles,
+  children,
+}: PropsWithChildren<{ allowedRoles: Role[] }>) {
+  return (
+    <ProtectedRoute>
+      <RoleGuard allowedRoles={allowedRoles}>{children}</RoleGuard>
+    </ProtectedRoute>
+  )
+}
+
+function VoteTournamentsRedirectPage() {
+  const location = useLocation()
+
+  return <Navigate to={{ pathname: ROUTES.voteHome, search: location.search }} replace />
 }
 
 export function AppRouter() {
@@ -71,10 +89,18 @@ export function AppRouter() {
           }
         />
         <Route
+          path={ROUTES.voteJoin}
+          element={
+            <VoterLayout>
+              <TournamentJoinPage />
+            </VoterLayout>
+          }
+        />
+        <Route
           path={ROUTES.voteTournaments}
           element={
             <VoterLayout>
-              <VoterTournamentListPage />
+              <VoteTournamentsRedirectPage />
             </VoterLayout>
           }
         />
@@ -99,6 +125,14 @@ export function AppRouter() {
           element={
             <VoterLayout>
               <VoteMatchPage />
+            </VoterLayout>
+          }
+        />
+        <Route
+          path={ROUTES.joinQr}
+          element={
+            <VoterLayout>
+              <TournamentJoinPage />
             </VoterLayout>
           }
         />
@@ -140,6 +174,14 @@ export function AppRouter() {
             <AppShellPage allowedRoles={ORGANIZER_ROLES}>
               <TournamentEditPage />
             </AppShellPage>
+          }
+        />
+        <Route
+          path={ROUTES.tournamentPresentation}
+          element={
+            <StandaloneProtectedPage allowedRoles={ORGANIZER_ROLES}>
+              <TournamentPresentationPage />
+            </StandaloneProtectedPage>
           }
         />
         <Route

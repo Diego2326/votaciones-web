@@ -1,45 +1,37 @@
-import { apiGet, apiPost } from '@/core/api/client'
-import type { PaginatedResponse } from '@/core/types/api'
-import type { Match, MyVote, Tournament, Vote, VoteResults } from '@/core/types/domain'
+import { apiGet, apiPost, sessionClient } from '@/core/api/client'
+import type {
+  MatchResults,
+  MyVote,
+  RoundResults,
+  TournamentResults,
+  Vote,
+} from '@/core/types/domain'
+import { normalizeMatch, type ApiMatch } from '@/features/matches/utils/normalizeMatch'
 import type { VotePayload } from '@/features/votes/types/vote.types'
-
-function normalizeTournamentList(
-  payload: Tournament[] | PaginatedResponse<Tournament>,
-) {
-  if (Array.isArray(payload)) {
-    return payload
-  }
-
-  if (Array.isArray(payload.content)) {
-    return payload.content
-  }
-
-  return []
-}
 
 export const voteApi = {
   submitVote(matchId: string, payload: VotePayload) {
-    return apiPost<Vote, VotePayload>(`/api/v1/matches/${matchId}/vote`, payload)
+    return apiPost<Vote, VotePayload>(`/api/v1/matches/${matchId}/vote`, payload, sessionClient)
   },
   getMatchResults(matchId: string) {
-    return apiGet<VoteResults>(`/api/v1/matches/${matchId}/results`)
+    return apiGet<MatchResults>(`/api/v1/matches/${matchId}/results`)
   },
-  getMyVote(matchId: string) {
-    return apiGet<MyVote>(`/api/v1/matches/${matchId}/my-vote`)
+  async getMyVote(matchId: string) {
+    const response = await apiGet<MyVote>(`/api/v1/matches/${matchId}/my-vote`, sessionClient)
+    return {
+      ...response,
+      participantId: response.participantId ?? response.selectedParticipantId ?? null,
+      selectedParticipantId: response.selectedParticipantId ?? response.participantId ?? null,
+    }
   },
   getTournamentResults(tournamentId: string) {
-    return apiGet<VoteResults>(`/api/v1/tournaments/${tournamentId}/results`)
-  },
-  async publicTournaments() {
-    const response = await apiGet<Tournament[] | PaginatedResponse<Tournament>>(
-      '/api/v1/tournaments',
-    )
-    return normalizeTournamentList(response)
+    return apiGet<TournamentResults>(`/api/v1/tournaments/${tournamentId}/results`)
   },
   roundResults(roundId: string) {
-    return apiGet<VoteResults>(`/api/v1/rounds/${roundId}/results`)
+    return apiGet<RoundResults>(`/api/v1/rounds/${roundId}/results`)
   },
-  matchDetails(matchId: string) {
-    return apiGet<Match>(`/api/v1/matches/${matchId}`)
+  async matchDetails(matchId: string) {
+    const response = await apiGet<ApiMatch>(`/api/v1/matches/${matchId}`)
+    return normalizeMatch(response)
   },
 }
