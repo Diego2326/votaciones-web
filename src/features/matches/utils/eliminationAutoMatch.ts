@@ -6,14 +6,30 @@ interface EliminationAutoMatchPlan {
   message?: string
 }
 
-function pickRandom<T>(items: T[]) {
-  return items[Math.floor(Math.random() * items.length)]
+function pickRandom<T>(items: T[]): T | null {
+  if (items.length === 0) {
+    return null
+  }
+
+  return items[Math.floor(Math.random() * items.length)] ?? null
 }
 
 function pickTwoRandomDistinct(participantIds: string[]) {
+  if (participantIds.length < 2) {
+    return null
+  }
+
   const firstId = pickRandom(participantIds)
+  if (!firstId) {
+    return null
+  }
+
   const remainingIds = participantIds.filter((id) => id !== firstId)
   const secondId = pickRandom(remainingIds)
+
+  if (!secondId) {
+    return null
+  }
 
   return [firstId, secondId] as const
 }
@@ -84,7 +100,15 @@ export function buildEliminationAutoMatchPlan({
   }
 
   if (matches.length === 0) {
-    const [participantAId, participantBId] = pickTwoRandomDistinct(remainingParticipantIds)
+    const randomPair = pickTwoRandomDistinct(remainingParticipantIds)
+
+    if (!randomPair) {
+      return {
+        message: 'No se pudo generar un duelo aleatorio con los participantes disponibles.',
+      }
+    }
+
+    const [participantAId, participantBId] = randomPair
 
     return {
       payload: buildManualMatchPayload(participantAId, participantBId),
@@ -94,7 +118,15 @@ export function buildEliminationAutoMatchPlan({
   const currentWinnerId = getLatestWinnerId(matches)
 
   if (!currentWinnerId || !remainingParticipantIds.includes(currentWinnerId)) {
-    const [participantAId, participantBId] = pickTwoRandomDistinct(remainingParticipantIds)
+    const randomPair = pickTwoRandomDistinct(remainingParticipantIds)
+
+    if (!randomPair) {
+      return {
+        message: 'No se pudo generar un duelo aleatorio con los participantes disponibles.',
+      }
+    }
+
+    const [participantAId, participantBId] = randomPair
 
     return {
       payload: buildManualMatchPayload(participantAId, participantBId),
@@ -109,7 +141,15 @@ export function buildEliminationAutoMatchPlan({
     }
   }
 
+  const opponentId = pickRandom(opponentCandidates)
+
+  if (!opponentId) {
+    return {
+      message: 'No se pudo seleccionar un rival para continuar la eliminacion.',
+    }
+  }
+
   return {
-    payload: buildManualMatchPayload(currentWinnerId, pickRandom(opponentCandidates)),
+    payload: buildManualMatchPayload(currentWinnerId, opponentId),
   }
 }
